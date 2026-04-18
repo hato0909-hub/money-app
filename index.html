@@ -76,6 +76,21 @@
     .empty{text-align:center;padding:50px 20px;color:#9CA3AF}
     .empty-icon{font-size:50px;margin-bottom:10px}
     /* エラーボックス */
+    /* カレンダー */
+    .cal-wrap{background:#fff;border-radius:14px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+    .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px}
+    .cal-dow span{text-align:center;font-size:11px;font-weight:700;color:#9CA3AF;padding:4px 0}
+    .cal-dow span:first-child{color:#EF4444}
+    .cal-dow span:last-child{color:#3B82F6}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+    .cal-cell{min-height:58px;padding:3px 2px;border-radius:6px;background:#F9FAFB;overflow:hidden}
+    .cal-cell.empty{background:transparent;min-height:0}
+    .cal-cell.today{background:#EEF2FF}
+    .cal-dn{font-size:11px;font-weight:600;color:#374151;text-align:center;line-height:1.6}
+    .cal-dn.sun{color:#EF4444}.cal-dn.sat{color:#3B82F6}
+    .cal-dn.cur{font-weight:800;background:#4F46E5;color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 2px;font-size:10px}
+    .cal-badges{display:flex;flex-direction:column;gap:1px}
+    .cal-badge{font-size:8.5px;color:#fff;padding:1px 3px;border-radius:3px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
     .err{background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:16px;color:#991B1B;font-size:13px;line-height:1.8;margin-bottom:12px}
     .err strong{display:block;font-size:14px;margin-bottom:8px;color:#7F1D1D}
     .err code{background:#FEE2E2;padding:1px 5px;border-radius:4px;font-size:12px}
@@ -115,6 +130,9 @@
   </button>
   <button class="nav-btn" id="nav-history" onclick="switchTab('history')">
     <span class="ni">📋</span><span>履歴</span>
+  </button>
+  <button class="nav-btn" id="nav-calendar" onclick="switchTab('calendar')">
+    <span class="ni">📅</span><span>カレンダー</span>
   </button>
 </div>
 <div class="toast" id="toast"></div>
@@ -219,6 +237,7 @@ async function apiDel(path) {
 // ═══════════════════════════════════════════════
 const CATS  = ['食費','日用品','外食費','子ども費','医療費','お小遣い','その他'];
 const ICONS = {'食費':'🍚','日用品':'🧴','外食費':'🍽️','子ども費':'👶','医療費':'🏥','お小遣い':'💰','その他':'📦'};
+const COLORS = {'食費':'#EAB308','日用品':'#F97316','外食費':'#EF4444','子ども費':'#22C55E','医療費':'#3B82F6','お小遣い':'#A855F7','その他':'#9CA3AF'};
 
 let yr, mo, tab = 'home', budgets = {}, expenses = [], selCat = null;
 
@@ -291,10 +310,11 @@ function switchTab(t) {
 }
 
 function renderTab() {
-  if (tab === 'home')    renderHome();
-  if (tab === 'add')     renderAdd();
-  if (tab === 'budget')  renderBudget();
-  if (tab === 'history') renderHistory();
+  if (tab === 'home')     renderHome();
+  if (tab === 'add')      renderAdd();
+  if (tab === 'budget')   renderBudget();
+  if (tab === 'history')  renderHistory();
+  if (tab === 'calendar') renderCalendar();
 }
 
 // ═══════════════════════════════════════════════
@@ -510,6 +530,59 @@ async function delExp(id,ey,em){
 // ═══════════════════════════════════════════════
 //  ユーティリティ
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  カレンダータブ
+// ═══════════════════════════════════════════════
+function renderCalendar() {
+  // 日付→支出リストのマップ
+  const dayMap = {};
+  expenses.forEach(e => {
+    const day = new Date(e.expense_date + 'T00:00:00').getDate();
+    (dayMap[day] = dayMap[day] || []).push(e);
+  });
+
+  const firstDow  = new Date(yr, mo - 1, 1).getDay(); // 0=日
+  const lastDay   = new Date(yr, mo, 0).getDate();
+  const todayObj  = new Date();
+  const isThisMo  = yr === todayObj.getFullYear() && mo === todayObj.getMonth() + 1;
+  const todayDate = todayObj.getDate();
+
+  let cells = '';
+  // 月初の空セル
+  for (let i = 0; i < firstDow; i++) cells += '<div class="cal-cell empty"></div>';
+
+  for (let d = 1; d <= lastDay; d++) {
+    const dow    = (firstDow + d - 1) % 7;
+    const isToday = isThisMo && d === todayDate;
+    const dnClass = isToday ? 'cur' : dow === 0 ? 'sun' : dow === 6 ? 'sat' : '';
+    const dayExps = dayMap[d] || [];
+
+    const badges = dayExps.map(e =>
+      `<div class="cal-badge" style="background:${COLORS[e.category]}">${abbr(e.amount)}</div>`
+    ).join('');
+
+    cells += `<div class="cal-cell${isToday ? ' today' : ''}">
+      <div class="cal-dn ${dnClass}">${d}</div>
+      <div class="cal-badges">${badges}</div>
+    </div>`;
+  }
+
+  setContent(`
+    <div class="cal-wrap">
+      <div class="cal-dow">
+        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+      </div>
+      <div class="cal-grid">${cells}</div>
+    </div>`);
+}
+
+// 金額省略表示（カレンダーバッジ用）
+function abbr(n) {
+  if (n >= 10000) return (Math.round(n / 1000) / 10) + '万';
+  if (n >= 1000)  return Math.round(n / 100) / 10 + 'k';
+  return '¥' + n;
+}
+
 function yen(n){return(n<0?'-¥':'¥')+Math.abs(n||0).toLocaleString('ja-JP');}
 function fdate(s){if(!s)return'';const d=new Date(s+'T00:00:00');return(d.getMonth()+1)+'/'+d.getDate();}
 function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
