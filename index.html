@@ -6,279 +6,126 @@
   <title>お金管理</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
-      background: #F3F4F6;
-      color: #111827;
-      min-height: 100vh;
-      max-width: 430px;
-      margin: 0 auto;
+      background: #F3F4F6; color: #111827;
+      min-height: 100vh; max-width: 430px; margin: 0 auto;
     }
-
-    /* ===== HEADER ===== */
     .header {
       background: linear-gradient(135deg, #4F46E5, #7C3AED);
-      color: white;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      color: white; padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
       box-shadow: 0 2px 8px rgba(79,70,229,0.3);
     }
-    .header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
-
+    .header-title { font-size: 17px; font-weight: 700; }
     .month-nav { display: flex; align-items: center; gap: 8px; }
     .month-btn {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: white;
-      width: 30px; height: 30px;
-      border-radius: 50%;
-      font-size: 17px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s;
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      width: 30px; height: 30px; border-radius: 50%; font-size: 17px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
     .month-btn:active { background: rgba(255,255,255,0.35); }
     .month-label { font-size: 14px; font-weight: 600; min-width: 78px; text-align: center; }
-
-    /* ===== BOTTOM NAV ===== */
     .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 430px;
-      background: white;
-      border-top: 1px solid #E5E7EB;
-      display: flex;
-      z-index: 100;
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px; background: white;
+      border-top: 1px solid #E5E7EB; display: flex; z-index: 100;
       padding-bottom: env(safe-area-inset-bottom);
     }
     .nav-btn {
-      flex: 1;
-      padding: 9px 0;
-      border: none;
-      background: none;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      color: #9CA3AF;
-      font-size: 10px;
-      font-weight: 500;
-      transition: color 0.15s;
+      flex: 1; padding: 9px 0; border: none; background: none; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      color: #9CA3AF; font-size: 10px; font-weight: 500;
     }
     .nav-btn .nav-icon { font-size: 22px; line-height: 1; }
     .nav-btn.active { color: #4F46E5; }
-
-    /* ===== CONTENT ===== */
-    .content {
-      padding: 14px 14px;
-      padding-bottom: calc(70px + env(safe-area-inset-bottom));
-    }
-
-    /* ===== CARDS ===== */
+    .content { padding: 14px; padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
     .card {
-      background: white;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      background: white; border-radius: 14px; padding: 16px;
+      margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
     }
-
-    /* ===== TOTAL CARD ===== */
     .total-card {
-      background: linear-gradient(135deg, #4F46E5, #7C3AED);
-      color: white;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white;
+      border-radius: 16px; padding: 18px; margin-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center;
     }
     .total-label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
     .total-amount { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
     .total-sub { font-size: 11px; opacity: 0.7; margin-top: 4px; }
-    .total-emoji { font-size: 42px; }
-
-    /* ===== CATEGORY CARD ===== */
     .cat-card { padding: 13px 16px; }
-    .cat-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 9px;
-    }
-    .cat-name {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-    .cat-icon-lg { font-size: 21px; }
+    .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+    .cat-name { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
     .amount-group { text-align: right; }
     .remaining-amount { font-size: 17px; font-weight: 800; line-height: 1; }
     .remaining-amount.ok { color: #10B981; }
     .remaining-amount.warn { color: #F59E0B; }
     .remaining-amount.over { color: #EF4444; }
     .spent-label { font-size: 11px; color: #9CA3AF; margin-top: 3px; }
-
     .progress-bar { height: 5px; background: #F3F4F6; border-radius: 3px; overflow: hidden; }
     .progress-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
     .progress-fill.ok { background: #10B981; }
     .progress-fill.warn { background: #F59E0B; }
     .progress-fill.over { background: #EF4444; }
-
-    /* ===== SECTION TITLE ===== */
     .section-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: #9CA3AF;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin: 6px 2px 10px;
+      font-size: 11px; font-weight: 700; color: #9CA3AF;
+      text-transform: uppercase; letter-spacing: 0.08em; margin: 6px 2px 10px;
     }
-
-    /* ===== FORM ===== */
     .form-group { margin-bottom: 16px; }
-    .form-label { display: block; font-size: 12px; font-weight: 700; color: #6B7280; margin-bottom: 7px; letter-spacing: 0.04em; }
+    .form-label { display: block; font-size: 12px; font-weight: 700; color: #6B7280; margin-bottom: 7px; }
     .form-input, .form-select {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid #E5E7EB;
-      border-radius: 11px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s;
-      background: white;
-      color: #111827;
-      font-family: inherit;
-      appearance: none;
+      width: 100%; padding: 12px 14px; border: 1.5px solid #E5E7EB;
+      border-radius: 11px; font-size: 16px; outline: none;
+      transition: border-color 0.2s; background: white; color: #111827; font-family: inherit;
     }
     .form-input:focus, .form-select:focus { border-color: #4F46E5; }
-    .amount-input {
-      font-size: 28px;
-      font-weight: 800;
-      text-align: right;
-      letter-spacing: -0.5px;
-      color: #111827;
-    }
-
-    /* ===== CATEGORY GRID ===== */
-    .cat-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
+    .amount-input { font-size: 28px; font-weight: 800; text-align: right; letter-spacing: -0.5px; }
+    .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .cat-pick-btn {
-      padding: 10px 4px 8px;
-      border: 2px solid #E5E7EB;
-      border-radius: 11px;
-      background: white;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      font-weight: 600;
-      color: #6B7280;
-      transition: all 0.15s;
+      padding: 10px 4px 8px; border: 2px solid #E5E7EB; border-radius: 11px;
+      background: white; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 600; color: #6B7280; transition: all 0.15s;
     }
     .cat-pick-btn .pick-icon { font-size: 24px; line-height: 1; }
-    .cat-pick-btn.selected {
-      border-color: #4F46E5;
-      background: #EEF2FF;
-      color: #4F46E5;
-    }
+    .cat-pick-btn.selected { border-color: #4F46E5; background: #EEF2FF; color: #4F46E5; }
     .cat-pick-btn:active { transform: scale(0.95); }
-
-    /* ===== PRIMARY BUTTON ===== */
     .btn-primary {
-      width: 100%;
-      padding: 15px;
+      width: 100%; padding: 15px;
       background: linear-gradient(135deg, #4F46E5, #7C3AED);
-      color: white;
-      border: none;
-      border-radius: 13px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      letter-spacing: 0.02em;
+      color: white; border: none; border-radius: 13px;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s; letter-spacing: 0.02em;
     }
     .btn-primary:active { transform: scale(0.98); }
     .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
     .btn-text {
-      background: none;
-      border: none;
-      color: #4F46E5;
-      font-size: 13px;
-      cursor: pointer;
-      font-family: inherit;
-      text-decoration: underline;
-      padding: 0;
+      background: none; border: none; color: #4F46E5;
+      font-size: 13px; cursor: pointer; font-family: inherit;
+      text-decoration: underline; padding: 0;
     }
-
-    /* ===== BUDGET ROWS ===== */
     .budget-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 0;
-      border-bottom: 1px solid #F9FAFB;
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 0; border-bottom: 1px solid #F9FAFB;
     }
     .budget-row:last-child { border-bottom: none; }
-    .budget-cat-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1;
-      font-size: 14px;
-      font-weight: 600;
-    }
+    .budget-cat-info { display: flex; align-items: center; gap: 8px; flex: 1; font-size: 14px; font-weight: 600; }
     .budget-input-wrap { width: 110px; }
     .budget-num-input {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1.5px solid #E5E7EB;
-      border-radius: 9px;
-      font-size: 15px;
-      font-weight: 700;
-      text-align: right;
-      outline: none;
-      font-family: inherit;
-      background: #FAFAFA;
+      width: 100%; padding: 8px 10px; border: 1.5px solid #E5E7EB;
+      border-radius: 9px; font-size: 15px; font-weight: 700; text-align: right;
+      outline: none; font-family: inherit; background: #FAFAFA;
     }
     .budget-num-input:focus { border-color: #4F46E5; background: white; }
-
-    /* ===== HISTORY ===== */
     .history-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 11px 0;
-      border-bottom: 1px solid #F9FAFB;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 0; border-bottom: 1px solid #F9FAFB;
     }
     .history-item:last-child { border-bottom: none; }
     .history-left { display: flex; align-items: center; gap: 10px; }
     .history-icon-wrap {
-      width: 38px; height: 38px;
-      background: #F3F4F6;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 19px;
-      flex-shrink: 0;
+      width: 38px; height: 38px; background: #F3F4F6; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;
     }
     .history-cat { font-size: 13px; font-weight: 700; }
     .history-memo { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
@@ -286,378 +133,257 @@
     .history-amount { font-size: 15px; font-weight: 800; color: #EF4444; }
     .history-date { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
     .history-delete {
-      background: none;
-      border: none;
-      color: #D1D5DB;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 4px 6px;
-      margin-left: 8px;
-      border-radius: 6px;
-      transition: color 0.15s, background 0.15s;
+      background: none; border: none; color: #D1D5DB; font-size: 16px;
+      cursor: pointer; padding: 4px 6px; margin-left: 8px; border-radius: 6px;
     }
     .history-delete:active { color: #EF4444; background: #FEF2F2; }
-
     .month-section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 2px 8px;
-      cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 2px 8px; cursor: pointer;
     }
     .month-section-title { font-size: 15px; font-weight: 700; }
     .month-section-total { font-size: 14px; font-weight: 800; color: #EF4444; }
-    .month-section-toggle { font-size: 12px; color: #9CA3AF; margin-left: 6px; }
-
-    /* ===== TOAST ===== */
     .toast {
       position: fixed;
       bottom: calc(75px + env(safe-area-inset-bottom));
-      left: 50%;
-      transform: translateX(-50%) translateY(10px);
-      background: rgba(17, 24, 39, 0.9);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 22px;
-      font-size: 13px;
-      font-weight: 600;
-      opacity: 0;
-      transition: opacity 0.25s, transform 0.25s;
-      z-index: 200;
-      white-space: nowrap;
-      backdrop-filter: blur(8px);
+      left: 50%; transform: translateX(-50%) translateY(10px);
+      background: rgba(17,24,39,0.9); color: white; padding: 10px 20px;
+      border-radius: 22px; font-size: 13px; font-weight: 600;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s;
+      z-index: 200; white-space: nowrap;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ===== LOADING / EMPTY ===== */
     .loading { display: flex; justify-content: center; align-items: center; padding: 60px; }
     .spinner {
-      width: 30px; height: 30px;
-      border: 3px solid #E5E7EB;
-      border-top-color: #4F46E5;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
+      width: 30px; height: 30px; border: 3px solid #E5E7EB;
+      border-top-color: #4F46E5; border-radius: 50%; animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .empty-state { text-align: center; padding: 50px 20px; color: #9CA3AF; }
     .empty-icon { font-size: 50px; margin-bottom: 10px; }
-    .empty-text { font-size: 13px; line-height: 1.6; }
-
-    /* ===== ERROR BANNER ===== */
-    .error-banner {
-      background: #FEF2F2;
-      border: 1px solid #FECACA;
-      border-radius: 10px;
-      padding: 12px 14px;
-      color: #DC2626;
-      font-size: 13px;
-      margin-bottom: 12px;
+    .err-box {
+      background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px;
+      padding: 16px; color: #991B1B; font-size: 13px; line-height: 1.7; margin-bottom: 12px;
     }
+    .err-box strong { display: block; font-size: 14px; margin-bottom: 6px; color: #7F1D1D; }
   </style>
 </head>
 <body>
-<div id="app">
-  <div class="header">
-    <div class="header-title">💴 お金管理</div>
-    <div class="month-nav">
-      <button class="month-btn" onclick="changeMonth(-1)">‹</button>
-      <span class="month-label" id="month-label">読込中</span>
-      <button class="month-btn" onclick="changeMonth(1)">›</button>
-    </div>
-  </div>
 
-  <div class="content" id="content">
-    <div class="loading"><div class="spinner"></div></div>
+<div class="header">
+  <div class="header-title">💴 お金管理</div>
+  <div class="month-nav">
+    <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+    <span class="month-label" id="month-label">--</span>
+    <button class="month-btn" onclick="changeMonth(1)">›</button>
   </div>
+</div>
 
-  <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
-      <span class="nav-icon">📊</span><span>概要</span>
-    </button>
-    <button class="nav-btn" id="nav-add" onclick="switchTab('add')">
-      <span class="nav-icon">➕</span><span>支出入力</span>
-    </button>
-    <button class="nav-btn" id="nav-budget" onclick="switchTab('budget')">
-      <span class="nav-icon">🎯</span><span>予算設定</span>
-    </button>
-    <button class="nav-btn" id="nav-history" onclick="switchTab('history')">
-      <span class="nav-icon">📋</span><span>履歴</span>
-    </button>
-  </div>
+<div class="content" id="content">
+  <div class="loading"><div class="spinner"></div></div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
+    <span class="nav-icon">📊</span><span>概要</span>
+  </button>
+  <button class="nav-btn" id="nav-add" onclick="switchTab('add')">
+    <span class="nav-icon">➕</span><span>支出入力</span>
+  </button>
+  <button class="nav-btn" id="nav-budget" onclick="switchTab('budget')">
+    <span class="nav-icon">🎯</span><span>予算設定</span>
+  </button>
+  <button class="nav-btn" id="nav-history" onclick="switchTab('history')">
+    <span class="nav-icon">📋</span><span>履歴</span>
+  </button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// =========================================
-// CONFIG
-// =========================================
-const SUPABASE_URL = 'https://ospiyfmijbpvwkgwhim.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcGl5Zm1pamJwdndrd2d3aGltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTY3MTMsImV4cCI6MjA5MjAzMjcxM30.rT3C8GDrmQiVGVOxEfWT-1CQ3y0yiAAzA1pvhqHH8wM';
+// ─── Supabase REST API 設定 ───────────────────────────────
+const URL_BASE = 'https://ospiyfmijbpvwkgwhim.supabase.co/rest/v1';
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcGl5Zm1pamJwdndrd2d3aGltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTY3MTMsImV4cCI6MjA5MjAzMjcxM30.rT3C8GDrmQiVGVOxEfWT-1CQ3y0yiAAzA1pvhqHH8wM';
 
-// =========================================
-// REST API ラッパー（Supabase JS 不要）
-// =========================================
-const H = {
-  'apikey': SUPABASE_KEY,
-  'Authorization': `Bearer ${SUPABASE_KEY}`,
-  'Content-Type': 'application/json',
-  'Accept': 'application/json'
-};
+const GH  = { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY };
+const PH  = { ...GH, 'Content-Type': 'application/json' };
+const UH  = { ...PH, 'Prefer': 'resolution=merge-duplicates,return=minimal' };
+const IH  = { ...PH, 'Prefer': 'return=minimal' };
 
-async function dbSelect(table, filters = {}, order = '') {
-  let q = Object.entries(filters).map(([k, v]) => `${k}=eq.${encodeURIComponent(v)}`).join('&');
-  if (order) q += (q ? '&' : '') + `order=${order}`;
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*&${q}`, { headers: H });
-  if (!r.ok) throw await r.json();
-  return r.json();
-}
+async function api(method, path, body) {
+  const isGet = method === 'GET';
+  const isDel = method === 'DELETE';
+  const isUps = path.includes('on_conflict');
+  const headers = isGet || isDel ? GH : isUps ? UH : IH;
 
-async function dbInsert(table, body) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-    method: 'POST', headers: H, body: JSON.stringify(body)
+  const res = await fetch(URL_BASE + path, {
+    method,
+    headers,
+    ...(body != null ? { body: JSON.stringify(body) } : {})
   });
-  if (!r.ok) throw await r.json();
-}
 
-async function dbUpsert(table, body, onConflict) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?on_conflict=${onConflict}`, {
-    method: 'POST',
-    headers: { ...H, 'Prefer': 'resolution=merge-duplicates' },
-    body: JSON.stringify(body)
-  });
-  if (!r.ok) throw await r.json();
-}
-
-async function dbDelete(table, id) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method: 'DELETE', headers: H
-  });
-  if (!r.ok) throw await r.json();
-}
-
-const CATEGORIES = ['食費', '日用品', '外食費', '子ども費', '医療費', 'お小遣い', 'その他'];
-const ICONS = {
-  '食費': '🍚', '日用品': '🧴', '外食費': '🍽️',
-  '子ども費': '👶', '医療費': '🏥', 'お小遣い': '💰', 'その他': '📦'
-};
-
-// =========================================
-// STATE
-// =========================================
-let currentYear, currentMonth;
-let currentTab = 'home';
-let budgets = {};
-let expenses = [];
-let selectedCategory = null;
-
-// =========================================
-// INIT
-// =========================================
-async function init() {
-  const now = new Date();
-  currentYear = now.getFullYear();
-  currentMonth = now.getMonth() + 1;
-  updateMonthLabel();
-
-  // 接続診断
-  showLoading();
-  const diag = await diagnose();
-  if (diag) {
-    document.getElementById('content').innerHTML = diag;
-    return;
+  if (!res.ok) {
+    const txt = await res.text().catch(() => res.statusText);
+    throw new Error(`HTTP ${res.status}: ${txt}`);
   }
+  if (method === 'GET') return res.json();
+}
+
+// ─── カテゴリ定義 ─────────────────────────────────────────
+const CATS  = ['食費','日用品','外食費','子ども費','医療費','お小遣い','その他'];
+const ICONS = {'食費':'🍚','日用品':'🧴','外食費':'🍽️','子ども費':'👶','医療費':'🏥','お小遣い':'💰','その他':'📦'};
+
+// ─── アプリ状態 ───────────────────────────────────────────
+let yr, mo, tab = 'home', budgets = {}, expenses = [], selCat = null;
+
+// ─── 初期化 ───────────────────────────────────────────────
+function init() {
+  const d = new Date();
+  yr = d.getFullYear();
+  mo = d.getMonth() + 1;
+  setMonthLabel();
   loadData();
 }
 
-async function diagnose() {
-  try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/budgets?select=id&limit=1`, { headers: H });
-    if (r.ok || r.status === 401 || r.status === 403 || r.status === 404) return null;
-    const body = await r.text();
-    return `<div class="error-banner"><strong>Supabase エラー (HTTP ${r.status})</strong><br><pre style="font-size:11px;margin-top:8px;white-space:pre-wrap">${body}</pre></div>
-            <button class="btn-primary" style="margin-top:8px" onclick="location.reload()">再試行</button>`;
-  } catch (e) {
-    return `<div class="error-banner"><strong>接続失敗: ${e.message}</strong><br><br>
-      ① Supabase ダッシュボードでプロジェクトが<b>アクティブ</b>か確認<br>
-      ② <code>python3 -m http.server 8080</code> でサーバーが起動中か確認<br>
-      ③ <code>http://localhost:8080</code> で開いているか確認
-    </div>
-    <button class="btn-primary" style="margin-top:8px" onclick="location.reload()">再試行</button>`;
-  }
-}
-
-function updateMonthLabel() {
-  document.getElementById('month-label').textContent = `${currentYear}年${currentMonth}月`;
+function setMonthLabel() {
+  document.getElementById('month-label').textContent = yr + '年' + mo + '月';
 }
 
 async function loadData() {
-  showLoading();
+  setContent('<div class="loading"><div class="spinner"></div></div>');
   try {
-    await Promise.all([loadBudgets(), loadExpenses()]);
+    const q = 'year=eq.' + yr + '&month=eq.' + mo;
+    const [b, e] = await Promise.all([
+      api('GET', '/budgets?select=*&' + q),
+      api('GET', '/expenses?select=*&' + q + '&order=expense_date.desc,created_at.desc')
+    ]);
+    budgets = {};
+    b.forEach(r => { budgets[r.category] = r.amount; });
+    expenses = e;
     renderTab();
-  } catch (e) {
-    console.error('loadData error:', e);
-    document.getElementById('content').innerHTML = `
-      <div class="error-banner">
-        <strong>読み込みエラー</strong><br>
-        ${e.message || JSON.stringify(e)}<br><br>
-        <small style="color:#991B1B">コード: ${e.code || e.status || '不明'} / ${e.hint || e.details || ''}</small>
-      </div>
-      <button class="btn-primary" style="margin-top:12px" onclick="loadData()">再試行</button>
-    `;
+  } catch (err) {
+    showErr(err);
   }
 }
 
-async function loadBudgets() {
-  const data = await dbSelect('budgets', { year: currentYear, month: currentMonth });
-  budgets = {};
-  data.forEach(b => { budgets[b.category] = b.amount; });
+function showErr(err) {
+  const net = err.message && (err.message.includes('fetch') || err.message.includes('network'));
+  setContent(`
+    <div class="err-box">
+      <strong>${net ? 'Supabase に接続できません' : 'エラーが発生しました'}</strong>
+      ${err.message}<br><br>
+      <b>確認してください：</b><br>
+      ・Supabase ダッシュボードでプロジェクトが<b>アクティブ</b>か<br>
+      ・無料プランは非アクティブで一時停止されます<br>
+      ・setup.sql を SQL Editor で実行済みか
+    </div>
+    <button class="btn-primary" onclick="loadData()">再試行</button>
+  `);
 }
 
-async function loadExpenses() {
-  expenses = await dbSelect('expenses',
-    { year: currentYear, month: currentMonth },
-    'expense_date.desc,created_at.desc'
-  );
-}
+function setContent(html) { document.getElementById('content').innerHTML = html; }
 
-// =========================================
-// MONTH NAVIGATION
-// =========================================
-function changeMonth(delta) {
-  currentMonth += delta;
-  if (currentMonth > 12) { currentMonth = 1; currentYear++; }
-  if (currentMonth < 1)  { currentMonth = 12; currentYear--; }
-  updateMonthLabel();
+// ─── 月切り替え ───────────────────────────────────────────
+function changeMonth(d) {
+  mo += d;
+  if (mo > 12) { mo = 1; yr++; }
+  if (mo < 1)  { mo = 12; yr--; }
+  setMonthLabel();
   loadData();
 }
 
-// =========================================
-// TAB SWITCHING
-// =========================================
-function switchTab(tab) {
-  currentTab = tab;
+// ─── タブ切り替え ─────────────────────────────────────────
+function switchTab(t) {
+  tab = t;
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(`nav-${tab}`).classList.add('active');
+  document.getElementById('nav-' + t).classList.add('active');
   renderTab();
 }
 
 function renderTab() {
-  switch (currentTab) {
-    case 'home':    renderHome(); break;
-    case 'add':     renderAdd(); break;
-    case 'budget':  renderBudget(); break;
-    case 'history': renderHistory(); break;
-  }
+  if (tab === 'home')    renderHome();
+  if (tab === 'add')     renderAdd();
+  if (tab === 'budget')  renderBudget();
+  if (tab === 'history') renderHistory();
 }
 
-function showLoading() {
-  document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-}
-
-// =========================================
-// HOME TAB
-// =========================================
+// ─── 概要タブ ─────────────────────────────────────────────
 function renderHome() {
-  const totalBudget = CATEGORIES.reduce((s, c) => s + (budgets[c] || 0), 0);
-  const totalSpent  = expenses.reduce((s, e) => s + e.amount, 0);
-  const totalLeft   = totalBudget - totalSpent;
+  const totBudget = CATS.reduce((s, c) => s + (budgets[c] || 0), 0);
+  const totSpent  = expenses.reduce((s, e) => s + e.amount, 0);
+  const totLeft   = totBudget - totSpent;
 
   let html = `
     <div class="total-card">
       <div>
         <div class="total-label">今月の残り予算</div>
-        <div class="total-amount">${fmtYen(totalLeft)}</div>
-        <div class="total-sub">${fmtYen(totalSpent)} 使用 ／ ${fmtYen(totalBudget)} 予算</div>
+        <div class="total-amount">${yen(totLeft)}</div>
+        <div class="total-sub">${yen(totSpent)} 使用 ／ ${yen(totBudget)} 予算</div>
       </div>
-      <div class="total-emoji">💴</div>
-    </div>
-  `;
+      <div style="font-size:42px">💴</div>
+    </div>`;
 
-  if (totalBudget === 0) {
-    html += `
-      <div class="card" style="text-align:center;padding:28px 16px">
-        <div style="font-size:44px;margin-bottom:10px">🎯</div>
-        <div style="font-size:14px;color:#6B7280;margin-bottom:18px;line-height:1.6">
-          まだ今月の予算が設定されていません。<br>予算を設定して管理を始めましょう。
-        </div>
-        <button class="btn-primary" style="width:auto;padding:12px 28px;display:inline-block" onclick="switchTab('budget')">
-          予算を設定する
-        </button>
+  if (totBudget === 0) {
+    html += `<div class="card" style="text-align:center;padding:28px 16px">
+      <div style="font-size:44px;margin-bottom:10px">🎯</div>
+      <div style="font-size:14px;color:#6B7280;margin-bottom:18px;line-height:1.6">
+        今月の予算がまだ設定されていません
       </div>
-    `;
+      <button class="btn-primary" style="width:auto;padding:12px 28px" onclick="switchTab('budget')">予算を設定する</button>
+    </div>`;
   }
 
   html += '<div class="section-title">カテゴリ別残額</div>';
 
-  CATEGORIES.forEach(cat => {
+  CATS.forEach(cat => {
     const budget = budgets[cat] || 0;
     const spent  = expenses.filter(e => e.category === cat).reduce((s, e) => s + e.amount, 0);
     const left   = budget - spent;
-    const pct    = budget > 0 ? Math.min((spent / budget) * 100, 100) : (spent > 0 ? 100 : 0);
-    const status = pct >= 100 ? 'over' : pct >= 80 ? 'warn' : 'ok';
-
+    const pct    = budget > 0 ? Math.min(spent / budget * 100, 100) : (spent > 0 ? 100 : 0);
+    const st     = pct >= 100 ? 'over' : pct >= 80 ? 'warn' : 'ok';
     html += `
       <div class="card cat-card">
         <div class="cat-header">
-          <div class="cat-name">
-            <span class="cat-icon-lg">${ICONS[cat]}</span>
-            <span>${cat}</span>
-          </div>
+          <div class="cat-name"><span style="font-size:21px">${ICONS[cat]}</span><span>${cat}</span></div>
           <div class="amount-group">
-            <div class="remaining-amount ${status}">${fmtYen(left)}</div>
-            <div class="spent-label">${fmtYen(spent)} 使用 ／ ${fmtYen(budget)}</div>
+            <div class="remaining-amount ${st}">${yen(left)}</div>
+            <div class="spent-label">${yen(spent)} 使用 ／ ${yen(budget)}</div>
           </div>
         </div>
-        <div class="progress-bar">
-          <div class="progress-fill ${status}" style="width:${pct}%"></div>
-        </div>
-      </div>
-    `;
+        <div class="progress-bar"><div class="progress-fill ${st}" style="width:${pct}%"></div></div>
+      </div>`;
   });
 
-  document.getElementById('content').innerHTML = html;
+  setContent(html);
 }
 
-// =========================================
-// ADD TAB
-// =========================================
+// ─── 支出入力タブ ─────────────────────────────────────────
 function renderAdd() {
-  const today = todayStr();
+  const catBtns = CATS.map(c => `
+    <button class="cat-pick-btn ${selCat === c ? 'selected' : ''}" onclick="pickCat('${c}')">
+      <span class="pick-icon">${ICONS[c]}</span><span>${c}</span>
+    </button>`).join('');
 
-  const catBtns = CATEGORIES.map(cat => `
-    <button class="cat-pick-btn ${selectedCategory === cat ? 'selected' : ''}"
-            onclick="pickCategory('${cat}')">
-      <span class="pick-icon">${ICONS[cat]}</span>
-      <span>${cat}</span>
-    </button>
-  `).join('');
-
-  const recentItems = expenses.slice(0, 5);
-  const recentHtml = recentItems.length === 0 ? '' : `
+  const recent = expenses.slice(0, 5);
+  const recentHtml = recent.length === 0 ? '' : `
     <div class="section-title" style="margin-top:8px">直近の支出</div>
-    <div class="card">
-      ${recentItems.map(e => `
-        <div class="history-item">
-          <div class="history-left">
-            <div class="history-icon-wrap">${ICONS[e.category]}</div>
-            <div>
-              <div class="history-cat">${e.category}</div>
-              ${e.memo ? `<div class="history-memo">${e.memo}</div>` : ''}
-            </div>
-          </div>
-          <div class="history-right">
-            <div class="history-amount">-${fmtYen(e.amount)}</div>
-            <div class="history-date">${fmtDate(e.expense_date)}</div>
+    <div class="card">${recent.map(e => `
+      <div class="history-item">
+        <div class="history-left">
+          <div class="history-icon-wrap">${ICONS[e.category]}</div>
+          <div>
+            <div class="history-cat">${e.category}</div>
+            ${e.memo ? `<div class="history-memo">${e.memo}</div>` : ''}
           </div>
         </div>
-      `).join('')}
-    </div>
-  `;
+        <div class="history-right">
+          <div class="history-amount">-${yen(e.amount)}</div>
+          <div class="history-date">${fmtDate(e.expense_date)}</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
 
-  document.getElementById('content').innerHTML = `
+  setContent(`
     <div class="card">
       <div class="form-group">
         <div class="form-label">カテゴリ</div>
@@ -674,220 +400,158 @@ function renderAdd() {
       </div>
       <div class="form-group" style="margin-bottom:20px">
         <div class="form-label">日付</div>
-        <input type="date" class="form-input" id="inp-date" value="${today}">
+        <input type="date" class="form-input" id="inp-date" value="${today()}">
       </div>
       <button class="btn-primary" id="btn-submit" onclick="submitExpense()">支出を記録する</button>
     </div>
-    ${recentHtml}
-  `;
-
-  // フォーカス後に数字キーボードを開く
-  setTimeout(() => {
-    if (selectedCategory) {
-      document.getElementById('inp-amount').focus();
-    }
-  }, 100);
+    ${recentHtml}`);
 }
 
-function pickCategory(cat) {
-  selectedCategory = cat;
+function pickCat(c) {
+  selCat = c;
   document.querySelectorAll('.cat-pick-btn').forEach(b => {
-    const name = b.querySelector('span:last-child').textContent;
-    b.classList.toggle('selected', name === cat);
+    b.classList.toggle('selected', b.querySelector('span:last-child').textContent === c);
   });
   document.getElementById('inp-amount').focus();
 }
 
 async function submitExpense() {
-  const amountEl = document.getElementById('inp-amount');
-  const memoEl   = document.getElementById('inp-memo');
-  const dateEl   = document.getElementById('inp-date');
-  const btn      = document.getElementById('btn-submit');
+  const amEl  = document.getElementById('inp-amount');
+  const moEl  = document.getElementById('inp-memo');
+  const dtEl  = document.getElementById('inp-date');
+  const btn   = document.getElementById('btn-submit');
+  const amount = parseInt(amEl.value);
+  const memo   = moEl.value.trim();
+  const date   = dtEl.value;
 
-  const amount = parseInt(amountEl.value);
-  const memo   = memoEl.value.trim();
-  const date   = dateEl.value;
-
-  if (!selectedCategory)       { showToast('カテゴリを選んでください'); return; }
-  if (!amount || amount <= 0)  { showToast('金額を入力してください'); amountEl.focus(); return; }
-  if (!date)                   { showToast('日付を選択してください'); return; }
+  if (!selCat)              { toast('カテゴリを選んでください'); return; }
+  if (!amount || amount < 1){ toast('金額を入力してください'); amEl.focus(); return; }
+  if (!date)                { toast('日付を選択してください'); return; }
 
   const d = new Date(date);
-  const year  = d.getFullYear();
-  const month = d.getMonth() + 1;
+  const ey = d.getFullYear(), em = d.getMonth() + 1;
 
-  btn.disabled = true;
-  btn.textContent = '記録中…';
-
+  btn.disabled = true; btn.textContent = '記録中…';
   try {
-    await dbInsert('expenses', { year, month, category: selectedCategory, amount, memo: memo || null, expense_date: date });
-  } catch (e) {
-    showToast('エラーが発生しました');
-    console.error(e);
-    btn.disabled = false;
-    btn.textContent = '支出を記録する';
-    return;
+    await api('POST', '/expenses', {
+      year: ey, month: em, category: selCat,
+      amount, memo: memo || null, expense_date: date
+    });
+    toast(ICONS[selCat] + ' ' + selCat + ' ' + yen(amount) + ' を記録しました');
+    amEl.value = ''; moEl.value = '';
+    if (ey === yr && em === mo) {
+      expenses = await api('GET', '/expenses?select=*&year=eq.' + yr + '&month=eq.' + mo + '&order=expense_date.desc,created_at.desc');
+    }
+    renderAdd();
+  } catch (err) {
+    toast('エラー: ' + err.message);
   }
-
-  showToast(`${ICONS[selectedCategory]} ${selectedCategory} ${fmtYen(amount)} を記録しました`);
-  amountEl.value = '';
-  memoEl.value   = '';
-
-  // 同じ月なら即反映
-  if (year === currentYear && month === currentMonth) {
-    await loadExpenses();
-  }
-  renderAdd();
+  btn.disabled = false; btn.textContent = '支出を記録する';
 }
 
-// =========================================
-// BUDGET TAB
-// =========================================
+// ─── 予算設定タブ ─────────────────────────────────────────
 function renderBudget() {
-  const total = CATEGORIES.reduce((s, c) => s + (budgets[c] || 0), 0);
-
-  const rows = CATEGORIES.map(cat => `
+  const total = CATS.reduce((s, c) => s + (budgets[c] || 0), 0);
+  const rows = CATS.map(c => `
     <div class="budget-row">
-      <div class="budget-cat-info">
-        <span style="font-size:22px">${ICONS[cat]}</span>
-        <span>${cat}</span>
-      </div>
+      <div class="budget-cat-info"><span style="font-size:22px">${ICONS[c]}</span><span>${c}</span></div>
       <div class="budget-input-wrap">
-        <input type="number" class="budget-num-input"
-               id="bgt-${cat.replace(/\s/g,'')}"
-               value="${budgets[cat] || ''}"
-               placeholder="0"
-               inputmode="numeric" pattern="[0-9]*">
+        <input type="number" class="budget-num-input" id="bgt-${c}"
+               value="${budgets[c] || ''}" placeholder="0" inputmode="numeric" pattern="[0-9]*">
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 
-  document.getElementById('content').innerHTML = `
+  setContent(`
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:15px;font-weight:700">${currentYear}年${currentMonth}月の予算</div>
-        <div style="font-size:12px;color:#9CA3AF" id="budget-total-display">合計 ${fmtYen(total)}</div>
+        <div style="font-size:15px;font-weight:700">${yr}年${mo}月の予算</div>
+        <div style="font-size:12px;color:#9CA3AF" id="bgt-total">合計 ${yen(total)}</div>
       </div>
       ${rows}
     </div>
-    <button class="btn-primary" id="btn-save-budget" onclick="saveBudgets()">予算を保存する</button>
+    <button class="btn-primary" id="btn-save" onclick="saveBudgets()">予算を保存する</button>
     <p style="text-align:center;font-size:12px;color:#9CA3AF;margin-top:14px">
       前月の予算をコピー：<button class="btn-text" onclick="copyLastMonth()">コピーする</button>
-    </p>
-  `;
+    </p>`);
 
-  // 入力値が変わるたびに合計を更新
-  CATEGORIES.forEach(cat => {
-    const id = 'bgt-' + cat.replace(/\s/g,'');
-    document.getElementById(id).addEventListener('input', updateBudgetTotal);
+  CATS.forEach(c => {
+    document.getElementById('bgt-' + c).addEventListener('input', () => {
+      const t = CATS.reduce((s, x) => s + (parseInt(document.getElementById('bgt-' + x).value) || 0), 0);
+      document.getElementById('bgt-total').textContent = '合計 ' + yen(t);
+    });
   });
-}
-
-function updateBudgetTotal() {
-  const total = CATEGORIES.reduce((s, cat) => {
-    const id = 'bgt-' + cat.replace(/\s/g,'');
-    const el = document.getElementById(id);
-    return s + (parseInt(el?.value) || 0);
-  }, 0);
-  const el = document.getElementById('budget-total-display');
-  if (el) el.textContent = '合計 ' + fmtYen(total);
 }
 
 async function saveBudgets() {
-  const btn = document.getElementById('btn-save-budget');
-  btn.disabled = true;
-  btn.textContent = '保存中…';
-
-  const upsertData = CATEGORIES.map(cat => {
-    const id = 'bgt-' + cat.replace(/\s/g,'');
-    return {
-      year: currentYear,
-      month: currentMonth,
-      category: cat,
-      amount: parseInt(document.getElementById(id).value) || 0
-    };
-  });
-
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.textContent = '保存中…';
+  const rows = CATS.map(c => ({
+    year: yr, month: mo, category: c,
+    amount: parseInt(document.getElementById('bgt-' + c).value) || 0
+  }));
   try {
-    await dbUpsert('budgets', upsertData, 'year,month,category');
-  } catch (e) {
-    showToast('エラーが発生しました');
-    console.error(e);
-    btn.disabled = false;
-    btn.textContent = '予算を保存する';
-    return;
+    await api('POST', '/budgets?on_conflict=year,month,category', rows);
+    rows.forEach(r => { budgets[r.category] = r.amount; });
+    toast('予算を保存しました');
+    renderBudget();
+  } catch (err) {
+    toast('エラー: ' + err.message);
   }
-
-  await loadBudgets();
-  showToast('予算を保存しました');
-  btn.disabled = false;
-  btn.textContent = '予算を保存する';
-  renderBudget();
+  btn.disabled = false; btn.textContent = '予算を保存する';
 }
 
 async function copyLastMonth() {
-  let y = currentYear, m = currentMonth - 1;
-  if (m < 1) { m = 12; y--; }
-
-  let data;
-  try { data = await dbSelect('budgets', { year: y, month: m }); } catch (e) { data = []; }
-
-  if (!data || data.length === 0) {
-    showToast('前月の予算データがありません');
-    return;
+  let py = yr, pm = mo - 1;
+  if (pm < 1) { pm = 12; py--; }
+  try {
+    const data = await api('GET', '/budgets?select=*&year=eq.' + py + '&month=eq.' + pm);
+    if (!data.length) { toast('前月の予算データがありません'); return; }
+    data.forEach(b => {
+      const el = document.getElementById('bgt-' + b.category);
+      if (el) el.value = b.amount;
+    });
+    const t = CATS.reduce((s, c) => s + (parseInt(document.getElementById('bgt-' + c).value) || 0), 0);
+    document.getElementById('bgt-total').textContent = '合計 ' + yen(t);
+    toast('前月の予算をコピーしました');
+  } catch (err) {
+    toast('エラー: ' + err.message);
   }
-
-  data.forEach(b => {
-    const id = 'bgt-' + b.category.replace(/\s/g,'');
-    const el = document.getElementById(id);
-    if (el) el.value = b.amount;
-  });
-  updateBudgetTotal();
-  showToast('前月の予算をコピーしました');
 }
 
-// =========================================
-// HISTORY TAB
-// =========================================
+// ─── 履歴タブ ─────────────────────────────────────────────
 async function renderHistory() {
-  showLoading();
-
-  // 直近6ヶ月分を取得
+  setContent('<div class="loading"><div class="spinner"></div></div>');
   const months = [];
   for (let i = 0; i < 6; i++) {
-    let m = currentMonth - i, y = currentYear;
+    let m = mo - i, y = yr;
     if (m < 1) { m += 12; y--; }
-    months.push({ year: y, month: m });
+    months.push({ y, m });
   }
-
   const results = await Promise.all(
-    months.map(({ year, month }) =>
-      dbSelect('expenses', { year, month }, 'expense_date.desc,created_at.desc').catch(() => [])
+    months.map(({ y, m }) =>
+      api('GET', '/expenses?select=*&year=eq.' + y + '&month=eq.' + m + '&order=expense_date.desc,created_at.desc')
+        .catch(() => [])
     )
   );
 
   let html = '';
-  let hasAny = false;
-
   results.forEach((items, i) => {
-    const { year, month } = months[i];
-    if (items.length === 0) return;
-    hasAny = true;
+    if (!items.length) return;
+    const { y, m } = months[i];
     const total = items.reduce((s, e) => s + e.amount, 0);
-    const isCurrentMonth = (i === 0);
-
+    const open  = i === 0;
     html += `
       <div class="card" style="padding:0 16px">
-        <div class="month-section-header" onclick="toggleMonthSection('ms-${year}-${month}', this)">
-          <div class="month-section-title">${year}年${month}月</div>
-          <div style="display:flex;align-items:center">
-            <span class="month-section-total">-${fmtYen(total)}</span>
-            <span class="month-section-toggle">${isCurrentMonth ? '▾' : '▸'}</span>
+        <div class="month-section-header" onclick="toggleSec('sec-${y}-${m}',this)">
+          <div class="month-section-title">${y}年${m}月</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="month-section-total">-${yen(total)}</span>
+            <span style="font-size:12px;color:#9CA3AF">${open ? '▾' : '▸'}</span>
           </div>
         </div>
-        <div id="ms-${year}-${month}" style="${isCurrentMonth ? '' : 'display:none'}">
+        <div id="sec-${y}-${m}" style="${open ? '' : 'display:none'}">
           ${items.map(e => `
-            <div class="history-item" id="exp-${e.id}">
+            <div class="history-item">
               <div class="history-left">
                 <div class="history-icon-wrap">${ICONS[e.category]}</div>
                 <div>
@@ -897,85 +561,59 @@ async function renderHistory() {
               </div>
               <div style="display:flex;align-items:center">
                 <div class="history-right">
-                  <div class="history-amount">-${fmtYen(e.amount)}</div>
+                  <div class="history-amount">-${yen(e.amount)}</div>
                   <div class="history-date">${fmtDate(e.expense_date)}</div>
                 </div>
-                <button class="history-delete" onclick="deleteExpense('${e.id}', ${year}, ${month})" title="削除">✕</button>
+                <button class="history-delete" onclick="delExp('${e.id}',${y},${m})">✕</button>
               </div>
-            </div>
-          `).join('')}
+            </div>`).join('')}
         </div>
-      </div>
-    `;
+      </div>`;
   });
 
-  if (!hasAny) {
-    html = `
-      <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <div class="empty-text">まだ支出の記録がありません</div>
-      </div>
-    `;
-  }
-
-  document.getElementById('content').innerHTML = html;
+  if (!html) html = '<div class="empty-state"><div class="empty-icon">📋</div><div>まだ支出の記録がありません</div></div>';
+  setContent(html);
 }
 
-function toggleMonthSection(id, header) {
+function toggleSec(id, hdr) {
   const el  = document.getElementById(id);
-  const tog = header.querySelector('.month-section-toggle');
-  const open = el.style.display !== 'none';
-  el.style.display = open ? 'none' : '';
-  tog.textContent  = open ? '▸' : '▾';
+  const tog = hdr.querySelector('span:last-child');
+  const show = el.style.display === 'none';
+  el.style.display = show ? '' : 'none';
+  tog.textContent  = show ? '▾' : '▸';
 }
 
-async function deleteExpense(id, year, month) {
+async function delExp(id, ey, em) {
   if (!confirm('この支出を削除しますか？')) return;
-
-  try { await dbDelete('expenses', id); } catch (e) { showToast('削除に失敗しました'); return; }
-
-  // 現在の表示月なら expenses を更新
-  if (year === currentYear && month === currentMonth) {
-    expenses = expenses.filter(e => e.id !== id);
+  try {
+    await api('DELETE', '/expenses?id=eq.' + id);
+    if (ey === yr && em === mo) expenses = expenses.filter(e => e.id !== id);
+    toast('削除しました');
+    renderHistory();
+  } catch (err) {
+    toast('削除失敗: ' + err.message);
   }
-
-  showToast('削除しました');
-  renderHistory();
 }
 
-// =========================================
-// UTILS
-// =========================================
-function fmtYen(n) {
-  if (n === null || n === undefined) return '¥0';
-  return (n < 0 ? '-¥' : '¥') + Math.abs(n).toLocaleString('ja-JP');
+// ─── ユーティリティ ───────────────────────────────────────
+function yen(n) {
+  return (n < 0 ? '-¥' : '¥') + Math.abs(n || 0).toLocaleString('ja-JP');
 }
-
-function fmtDate(str) {
-  if (!str) return '';
-  const d = new Date(str + 'T00:00:00');
-  return `${d.getMonth() + 1}/${d.getDate()}`;
+function fmtDate(s) {
+  if (!s) return '';
+  const d = new Date(s + 'T00:00:00');
+  return (d.getMonth() + 1) + '/' + d.getDate();
 }
-
-function todayStr() {
+function today() {
   const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
-
-function showToast(msg) {
+function toast(msg) {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.remove('show'), 2800);
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2800);
 }
 
-// =========================================
-// START
-// =========================================
 init();
 </script>
 </body>
