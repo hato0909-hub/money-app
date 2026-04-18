@@ -5,167 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>お金管理</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
-      background: #F3F4F6; color: #111827;
-      min-height: 100vh; max-width: 430px; margin: 0 auto;
-    }
-    .header {
-      background: linear-gradient(135deg, #4F46E5, #7C3AED);
-      color: white; padding: 14px 16px;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 2px 8px rgba(79,70,229,0.3);
-    }
-    .header-title { font-size: 17px; font-weight: 700; }
-    .month-nav { display: flex; align-items: center; gap: 8px; }
-    .month-btn {
-      background: rgba(255,255,255,0.2); border: none; color: white;
-      width: 30px; height: 30px; border-radius: 50%; font-size: 17px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-    }
-    .month-btn:active { background: rgba(255,255,255,0.35); }
-    .month-label { font-size: 14px; font-weight: 600; min-width: 78px; text-align: center; }
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 430px; background: white;
-      border-top: 1px solid #E5E7EB; display: flex; z-index: 100;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    .nav-btn {
-      flex: 1; padding: 9px 0; border: none; background: none; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      color: #9CA3AF; font-size: 10px; font-weight: 500;
-    }
-    .nav-btn .nav-icon { font-size: 22px; line-height: 1; }
-    .nav-btn.active { color: #4F46E5; }
-    .content { padding: 14px; padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
-    .card {
-      background: white; border-radius: 14px; padding: 16px;
-      margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    }
-    .total-card {
-      background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white;
-      border-radius: 16px; padding: 18px; margin-bottom: 14px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .total-label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
-    .total-amount { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
-    .total-sub { font-size: 11px; opacity: 0.7; margin-top: 4px; }
-    .cat-card { padding: 13px 16px; }
-    .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
-    .cat-name { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
-    .amount-group { text-align: right; }
-    .remaining-amount { font-size: 17px; font-weight: 800; line-height: 1; }
-    .remaining-amount.ok { color: #10B981; }
-    .remaining-amount.warn { color: #F59E0B; }
-    .remaining-amount.over { color: #EF4444; }
-    .spent-label { font-size: 11px; color: #9CA3AF; margin-top: 3px; }
-    .progress-bar { height: 5px; background: #F3F4F6; border-radius: 3px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
-    .progress-fill.ok { background: #10B981; }
-    .progress-fill.warn { background: #F59E0B; }
-    .progress-fill.over { background: #EF4444; }
-    .section-title {
-      font-size: 11px; font-weight: 700; color: #9CA3AF;
-      text-transform: uppercase; letter-spacing: 0.08em; margin: 6px 2px 10px;
-    }
-    .form-group { margin-bottom: 16px; }
-    .form-label { display: block; font-size: 12px; font-weight: 700; color: #6B7280; margin-bottom: 7px; }
-    .form-input, .form-select {
-      width: 100%; padding: 12px 14px; border: 1.5px solid #E5E7EB;
-      border-radius: 11px; font-size: 16px; outline: none;
-      transition: border-color 0.2s; background: white; color: #111827; font-family: inherit;
-    }
-    .form-input:focus, .form-select:focus { border-color: #4F46E5; }
-    .amount-input { font-size: 28px; font-weight: 800; text-align: right; letter-spacing: -0.5px; }
-    .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .cat-pick-btn {
-      padding: 10px 4px 8px; border: 2px solid #E5E7EB; border-radius: 11px;
-      background: white; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; gap: 5px;
-      font-size: 10px; font-weight: 600; color: #6B7280; transition: all 0.15s;
-    }
-    .cat-pick-btn .pick-icon { font-size: 24px; line-height: 1; }
-    .cat-pick-btn.selected { border-color: #4F46E5; background: #EEF2FF; color: #4F46E5; }
-    .cat-pick-btn:active { transform: scale(0.95); }
-    .btn-primary {
-      width: 100%; padding: 15px;
-      background: linear-gradient(135deg, #4F46E5, #7C3AED);
-      color: white; border: none; border-radius: 13px;
-      font-size: 16px; font-weight: 700; cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s; letter-spacing: 0.02em;
-    }
-    .btn-primary:active { transform: scale(0.98); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-text {
-      background: none; border: none; color: #4F46E5;
-      font-size: 13px; cursor: pointer; font-family: inherit;
-      text-decoration: underline; padding: 0;
-    }
-    .budget-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 0; border-bottom: 1px solid #F9FAFB;
-    }
-    .budget-row:last-child { border-bottom: none; }
-    .budget-cat-info { display: flex; align-items: center; gap: 8px; flex: 1; font-size: 14px; font-weight: 600; }
-    .budget-input-wrap { width: 110px; }
-    .budget-num-input {
-      width: 100%; padding: 8px 10px; border: 1.5px solid #E5E7EB;
-      border-radius: 9px; font-size: 15px; font-weight: 700; text-align: right;
-      outline: none; font-family: inherit; background: #FAFAFA;
-    }
-    .budget-num-input:focus { border-color: #4F46E5; background: white; }
-    .history-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 11px 0; border-bottom: 1px solid #F9FAFB;
-    }
-    .history-item:last-child { border-bottom: none; }
-    .history-left { display: flex; align-items: center; gap: 10px; }
-    .history-icon-wrap {
-      width: 38px; height: 38px; background: #F3F4F6; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;
-    }
-    .history-cat { font-size: 13px; font-weight: 700; }
-    .history-memo { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
-    .history-right { text-align: right; flex-shrink: 0; }
-    .history-amount { font-size: 15px; font-weight: 800; color: #EF4444; }
-    .history-date { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
-    .history-delete {
-      background: none; border: none; color: #D1D5DB; font-size: 16px;
-      cursor: pointer; padding: 4px 6px; margin-left: 8px; border-radius: 6px;
-    }
-    .history-delete:active { color: #EF4444; background: #FEF2F2; }
-    .month-section-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 2px 8px; cursor: pointer;
-    }
-    .month-section-title { font-size: 15px; font-weight: 700; }
-    .month-section-total { font-size: 14px; font-weight: 800; color: #EF4444; }
-    .toast {
-      position: fixed;
-      bottom: calc(75px + env(safe-area-inset-bottom));
-      left: 50%; transform: translateX(-50%) translateY(10px);
-      background: rgba(17,24,39,0.9); color: white; padding: 10px 20px;
-      border-radius: 22px; font-size: 13px; font-weight: 600;
-      opacity: 0; transition: opacity 0.25s, transform 0.25s;
-      z-index: 200; white-space: nowrap;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .loading { display: flex; justify-content: center; align-items: center; padding: 60px; }
-    .spinner {
-      width: 30px; height: 30px; border: 3px solid #E5E7EB;
-      border-top-color: #4F46E5; border-radius: 50%; animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .empty-state { text-align: center; padding: 50px 20px; color: #9CA3AF; }
-    .empty-icon { font-size: 50px; margin-bottom: 10px; }
-    .err-box {
-      background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px;
-      padding: 16px; color: #991B1B; font-size: 13px; line-height: 1.7; margin-bottom: 12px;
-    }
-    .err-box strong { display: block; font-size: 14px; margin-bottom: 6px; color: #7F1D1D; }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;background:#F3F4F6;color:#111827;min-height:100vh;max-width:430px;margin:0 auto}
+    .header{background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+    .header-title{font-size:17px;font-weight:700}
+    .month-nav{display:flex;align-items:center;gap:8px}
+    .month-btn{background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .month-btn:active{background:rgba(255,255,255,.35)}
+    .month-label{font-size:14px;font-weight:600;min-width:78px;text-align:center}
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid #E5E7EB;display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+    .nav-btn{flex:1;padding:9px 0;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:#9CA3AF;font-size:10px;font-weight:500}
+    .nav-btn .ni{font-size:22px;line-height:1}
+    .nav-btn.active{color:#4F46E5}
+    .content{padding:14px;padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+    .card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+    .total-card{background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;border-radius:16px;padding:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+    .tl{font-size:12px;opacity:.8;margin-bottom:4px}
+    .ta{font-size:28px;font-weight:800;letter-spacing:-.5px}
+    .ts{font-size:11px;opacity:.7;margin-top:4px}
+    .cat-card{padding:13px 16px}
+    .cat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+    .cat-name{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+    .ag{text-align:right}
+    .ra{font-size:17px;font-weight:800;line-height:1}
+    .ra.ok{color:#10B981}.ra.warn{color:#F59E0B}.ra.over{color:#EF4444}
+    .sl{font-size:11px;color:#9CA3AF;margin-top:3px}
+    .pb{height:5px;background:#F3F4F6;border-radius:3px;overflow:hidden}
+    .pf{height:100%;border-radius:3px;transition:width .4s ease}
+    .pf.ok{background:#10B981}.pf.warn{background:#F59E0B}.pf.over{background:#EF4444}
+    .sec-title{font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.08em;margin:6px 2px 10px}
+    .fg{margin-bottom:16px}
+    .fl{display:block;font-size:12px;font-weight:700;color:#6B7280;margin-bottom:7px}
+    .fi,.fs{width:100%;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:11px;font-size:16px;outline:none;transition:border-color .2s;background:#fff;color:#111827;font-family:inherit}
+    .fi:focus,.fs:focus{border-color:#4F46E5}
+    .ai{font-size:28px;font-weight:800;text-align:right;letter-spacing:-.5px}
+    .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .cpb{padding:10px 4px 8px;border:2px solid #E5E7EB;border-radius:11px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:600;color:#6B7280;transition:all .15s}
+    .cpb .pi{font-size:24px;line-height:1}
+    .cpb.sel{border-color:#4F46E5;background:#EEF2FF;color:#4F46E5}
+    .cpb:active{transform:scale(.95)}
+    .btn{width:100%;padding:15px;background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;border:none;border-radius:13px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:.02em}
+    .btn:active{transform:scale(.98)}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-txt{background:none;border:none;color:#4F46E5;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0}
+    .br{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #F9FAFB}
+    .br:last-child{border-bottom:none}
+    .bci{display:flex;align-items:center;gap:8px;flex:1;font-size:14px;font-weight:600}
+    .biw{width:110px}
+    .bi{width:100%;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:15px;font-weight:700;text-align:right;outline:none;font-family:inherit;background:#FAFAFA}
+    .bi:focus{border-color:#4F46E5;background:#fff}
+    .hi{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid #F9FAFB}
+    .hi:last-child{border-bottom:none}
+    .hl{display:flex;align-items:center;gap:10px}
+    .hiw{width:38px;height:38px;background:#F3F4F6;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+    .hcat{font-size:13px;font-weight:700}
+    .hmemo{font-size:11px;color:#9CA3AF;margin-top:2px}
+    .hr{text-align:right;flex-shrink:0}
+    .hamt{font-size:15px;font-weight:800;color:#EF4444}
+    .hdate{font-size:11px;color:#9CA3AF;margin-top:2px}
+    .hdel{background:none;border:none;color:#D1D5DB;font-size:16px;cursor:pointer;padding:4px 6px;margin-left:8px;border-radius:6px}
+    .hdel:active{color:#EF4444;background:#FEF2F2}
+    .msh{display:flex;justify-content:space-between;align-items:center;padding:14px 2px 8px;cursor:pointer}
+    .mst{font-size:15px;font-weight:700}
+    .mstot{font-size:14px;font-weight:800;color:#EF4444}
+    .toast{position:fixed;bottom:calc(75px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(10px);background:rgba(17,24,39,.9);color:#fff;padding:10px 20px;border-radius:22px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s,transform .25s;z-index:200;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .loading{display:flex;justify-content:center;align-items:center;padding:60px}
+    .spinner{width:30px;height:30px;border:3px solid #E5E7EB;border-top-color:#4F46E5;border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .empty{text-align:center;padding:50px 20px;color:#9CA3AF}
+    .empty-icon{font-size:50px;margin-bottom:10px}
+    /* エラーボックス */
+    .err{background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:16px;color:#991B1B;font-size:13px;line-height:1.8;margin-bottom:12px}
+    .err strong{display:block;font-size:14px;margin-bottom:8px;color:#7F1D1D}
+    .err code{background:#FEE2E2;padding:1px 5px;border-radius:4px;font-size:12px}
+    /* 診断ボックス */
+    .diag{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:14px;font-size:12px;color:#1E40AF;margin-bottom:12px}
+    .diag strong{font-size:13px;display:block;margin-bottom:8px}
+    .diag-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #DBEAFE}
+    .diag-row:last-child{border-bottom:none}
+    .ok-txt{color:#059669;font-weight:700}
+    .ng-txt{color:#DC2626;font-weight:700}
   </style>
 </head>
 <body>
@@ -185,63 +105,146 @@
 
 <div class="bottom-nav">
   <button class="nav-btn active" id="nav-home" onclick="switchTab('home')">
-    <span class="nav-icon">📊</span><span>概要</span>
+    <span class="ni">📊</span><span>概要</span>
   </button>
   <button class="nav-btn" id="nav-add" onclick="switchTab('add')">
-    <span class="nav-icon">➕</span><span>支出入力</span>
+    <span class="ni">➕</span><span>支出入力</span>
   </button>
   <button class="nav-btn" id="nav-budget" onclick="switchTab('budget')">
-    <span class="nav-icon">🎯</span><span>予算設定</span>
+    <span class="ni">🎯</span><span>予算設定</span>
   </button>
   <button class="nav-btn" id="nav-history" onclick="switchTab('history')">
-    <span class="nav-icon">📋</span><span>履歴</span>
+    <span class="ni">📋</span><span>履歴</span>
   </button>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── Supabase REST API 設定 ───────────────────────────────
-const URL_BASE = 'https://ospiyfmijbpvwkgwhim.supabase.co/rest/v1';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcGl5Zm1pamJwdndrd2d3aGltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTY3MTMsImV4cCI6MjA5MjAzMjcxM30.rT3C8GDrmQiVGVOxEfWT-1CQ3y0yiAAzA1pvhqHH8wM';
+// ═══════════════════════════════════════════════
+//  設定
+// ═══════════════════════════════════════════════
+const BASE = 'https://ospiyfmijbpvwkgwhim.supabase.co/rest/v1';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcGl5Zm1pamJwdndrd2d3aGltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTY3MTMsImV4cCI6MjA5MjAzMjcxM30.rT3C8GDrmQiVGVOxEfWT-1CQ3y0yiAAzA1pvhqHH8wM';
 
-const GH  = { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY };
-const PH  = { ...GH, 'Content-Type': 'application/json' };
-const UH  = { ...PH, 'Prefer': 'resolution=merge-duplicates,return=minimal' };
-const IH  = { ...PH, 'Prefer': 'return=minimal' };
+// ═══════════════════════════════════════════════
+//  接続診断（起動時 1 回だけ）
+// ═══════════════════════════════════════════════
+async function checkConnectivity() {
+  // ① no-cors で到達確認（CORS preflight なし・レスポンスは opaque）
+  const reachable = await fetch(BASE + '/', { mode: 'no-cors' })
+    .then(() => true).catch(() => false);
 
-async function api(method, path, body) {
-  const isGet = method === 'GET';
-  const isDel = method === 'DELETE';
-  const isUps = path.includes('on_conflict');
-  const headers = isGet || isDel ? GH : isUps ? UH : IH;
-
-  const res = await fetch(URL_BASE + path, {
-    method,
-    headers,
-    ...(body != null ? { body: JSON.stringify(body) } : {})
-  });
-
-  if (!res.ok) {
-    const txt = await res.text().catch(() => res.statusText);
-    throw new Error(`HTTP ${res.status}: ${txt}`);
+  if (!reachable) {
+    return {
+      ok: false,
+      type: 'network',
+      msg: 'Supabase サーバーに到達できません（DNS/ネットワーク障害）',
+      hint: [
+        '・Supabase ダッシュボードで <strong>プロジェクトが Active</strong> か確認',
+        '・ブラウザのアドレスバーに <code>https://ospiyfmijbpvwkgwhim.supabase.co</code> と入力して開けるか確認',
+        '・VPN やファイアウォールが supabase.co をブロックしていないか確認',
+      ]
+    };
   }
-  if (method === 'GET') return res.json();
+
+  // ② 実際の API リクエスト（CORS あり・認証あり）
+  try {
+    const r = await fetch(BASE + '/budgets?select=id&limit=1&apikey=' + KEY, {
+      headers: { 'Authorization': 'Bearer ' + KEY }
+    });
+    if (r.ok || r.status === 404) return { ok: true };
+    if (r.status === 400 || r.status === 42501) {
+      return {
+        ok: false, type: 'rls',
+        msg: 'RLS ポリシーがアクセスを拒否しています (HTTP ' + r.status + ')',
+        hint: ['・setup.sql の <code>CREATE POLICY</code> をまだ実行していない可能性があります']
+      };
+    }
+    const body = await r.text().catch(() => '');
+    return {
+      ok: false, type: 'api',
+      msg: 'API エラー (HTTP ' + r.status + ')',
+      hint: ['<code>' + body.slice(0, 200) + '</code>']
+    };
+  } catch (e) {
+    // no-cors は通ったのに cors が通らない → CORS preflight 失敗
+    return {
+      ok: false, type: 'cors',
+      msg: 'CORS エラー：Supabase がこのオリジンをブロックしています',
+      hint: [
+        '・Supabase ダッシュボード → <strong>Project Settings → API → CORS</strong>',
+        '・Allowed origins に <code>https://hato0909-hub.github.io</code> を追加して Save',
+      ]
+    };
+  }
 }
 
-// ─── カテゴリ定義 ─────────────────────────────────────────
+// ═══════════════════════════════════════════════
+//  REST API ラッパー
+// ═══════════════════════════════════════════════
+// GETはquery paramにapikey（preflight不要）、POST/DELETEはheaderも付与
+async function apiGet(path) {
+  const sep = path.includes('?') ? '&' : '?';
+  const r = await fetch(BASE + path + sep + 'apikey=' + KEY, {
+    headers: { 'Authorization': 'Bearer ' + KEY, 'Accept': 'application/json' }
+  });
+  if (!r.ok) { const t = await r.text().catch(() => r.statusText); throw new Error('HTTP ' + r.status + ': ' + t); }
+  return r.json();
+}
+
+async function apiPost(path, body, prefer) {
+  const r = await fetch(BASE + path, {
+    method: 'POST',
+    headers: {
+      'apikey': KEY,
+      'Authorization': 'Bearer ' + KEY,
+      'Content-Type': 'application/json',
+      'Prefer': prefer || 'return=minimal'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { const t = await r.text().catch(() => r.statusText); throw new Error('HTTP ' + r.status + ': ' + t); }
+}
+
+async function apiDel(path) {
+  const sep = path.includes('?') ? '&' : '?';
+  const r = await fetch(BASE + path + sep + 'apikey=' + KEY, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + KEY }
+  });
+  if (!r.ok) { const t = await r.text().catch(() => r.statusText); throw new Error('HTTP ' + r.status + ': ' + t); }
+}
+
+// ═══════════════════════════════════════════════
+//  定数・状態
+// ═══════════════════════════════════════════════
 const CATS  = ['食費','日用品','外食費','子ども費','医療費','お小遣い','その他'];
 const ICONS = {'食費':'🍚','日用品':'🧴','外食費':'🍽️','子ども費':'👶','医療費':'🏥','お小遣い':'💰','その他':'📦'};
 
-// ─── アプリ状態 ───────────────────────────────────────────
 let yr, mo, tab = 'home', budgets = {}, expenses = [], selCat = null;
 
-// ─── 初期化 ───────────────────────────────────────────────
-function init() {
+// ═══════════════════════════════════════════════
+//  初期化
+// ═══════════════════════════════════════════════
+async function init() {
   const d = new Date();
-  yr = d.getFullYear();
-  mo = d.getMonth() + 1;
+  yr = d.getFullYear(); mo = d.getMonth() + 1;
   setMonthLabel();
+  setContent('<div class="loading"><div class="spinner"></div></div>');
+
+  const conn = await checkConnectivity();
+  if (!conn.ok) {
+    setContent(`
+      <div class="diag">
+        <strong>🔍 接続診断結果：${conn.type === 'cors' ? 'CORS エラー' : conn.type === 'network' ? 'ネットワークエラー' : conn.type === 'rls' ? 'RLS エラー' : 'API エラー'}</strong>
+        ${conn.msg}<br><br>
+        <b>対処方法：</b><br>
+        ${conn.hint.map(h => '• ' + h).join('<br>')}
+      </div>
+      <button class="btn" onclick="init()">再試行</button>
+    `);
+    return;
+  }
   loadData();
 }
 
@@ -254,45 +257,33 @@ async function loadData() {
   try {
     const q = 'year=eq.' + yr + '&month=eq.' + mo;
     const [b, e] = await Promise.all([
-      api('GET', '/budgets?select=*&' + q),
-      api('GET', '/expenses?select=*&' + q + '&order=expense_date.desc,created_at.desc')
+      apiGet('/budgets?select=*&' + q),
+      apiGet('/expenses?select=*&' + q + '&order=expense_date.desc,created_at.desc')
     ]);
     budgets = {};
     b.forEach(r => { budgets[r.category] = r.amount; });
     expenses = e;
     renderTab();
   } catch (err) {
-    showErr(err);
+    setContent(`
+      <div class="err"><strong>読み込みエラー</strong>${err.message}</div>
+      <button class="btn" onclick="loadData()">再試行</button>
+    `);
   }
 }
 
-function showErr(err) {
-  const net = err.message && (err.message.includes('fetch') || err.message.includes('network'));
-  setContent(`
-    <div class="err-box">
-      <strong>${net ? 'Supabase に接続できません' : 'エラーが発生しました'}</strong>
-      ${err.message}<br><br>
-      <b>確認してください：</b><br>
-      ・Supabase ダッシュボードでプロジェクトが<b>アクティブ</b>か<br>
-      ・無料プランは非アクティブで一時停止されます<br>
-      ・setup.sql を SQL Editor で実行済みか
-    </div>
-    <button class="btn-primary" onclick="loadData()">再試行</button>
-  `);
-}
+function setContent(h) { document.getElementById('content').innerHTML = h; }
 
-function setContent(html) { document.getElementById('content').innerHTML = html; }
-
-// ─── 月切り替え ───────────────────────────────────────────
+// ═══════════════════════════════════════════════
+//  ナビゲーション
+// ═══════════════════════════════════════════════
 function changeMonth(d) {
   mo += d;
   if (mo > 12) { mo = 1; yr++; }
   if (mo < 1)  { mo = 12; yr--; }
-  setMonthLabel();
-  loadData();
+  setMonthLabel(); loadData();
 }
 
-// ─── タブ切り替え ─────────────────────────────────────────
 function switchTab(t) {
   tab = t;
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -307,312 +298,223 @@ function renderTab() {
   if (tab === 'history') renderHistory();
 }
 
-// ─── 概要タブ ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+//  概要タブ
+// ═══════════════════════════════════════════════
 function renderHome() {
-  const totBudget = CATS.reduce((s, c) => s + (budgets[c] || 0), 0);
-  const totSpent  = expenses.reduce((s, e) => s + e.amount, 0);
-  const totLeft   = totBudget - totSpent;
+  const tb = CATS.reduce((s,c) => s + (budgets[c]||0), 0);
+  const ts = expenses.reduce((s,e) => s + e.amount, 0);
+  let h = `<div class="total-card">
+    <div>
+      <div class="tl">今月の残り予算</div>
+      <div class="ta">${yen(tb-ts)}</div>
+      <div class="ts">${yen(ts)} 使用 ／ ${yen(tb)} 予算</div>
+    </div>
+    <div style="font-size:42px">💴</div>
+  </div>`;
 
-  let html = `
-    <div class="total-card">
-      <div>
-        <div class="total-label">今月の残り予算</div>
-        <div class="total-amount">${yen(totLeft)}</div>
-        <div class="total-sub">${yen(totSpent)} 使用 ／ ${yen(totBudget)} 予算</div>
-      </div>
-      <div style="font-size:42px">💴</div>
-    </div>`;
+  if (tb === 0) h += `<div class="card" style="text-align:center;padding:28px 16px">
+    <div style="font-size:44px;margin-bottom:10px">🎯</div>
+    <div style="font-size:14px;color:#6B7280;margin-bottom:18px;line-height:1.6">今月の予算がまだ設定されていません</div>
+    <button class="btn" style="width:auto;padding:12px 28px" onclick="switchTab('budget')">予算を設定する</button>
+  </div>`;
 
-  if (totBudget === 0) {
-    html += `<div class="card" style="text-align:center;padding:28px 16px">
-      <div style="font-size:44px;margin-bottom:10px">🎯</div>
-      <div style="font-size:14px;color:#6B7280;margin-bottom:18px;line-height:1.6">
-        今月の予算がまだ設定されていません
-      </div>
-      <button class="btn-primary" style="width:auto;padding:12px 28px" onclick="switchTab('budget')">予算を設定する</button>
-    </div>`;
-  }
-
-  html += '<div class="section-title">カテゴリ別残額</div>';
-
-  CATS.forEach(cat => {
-    const budget = budgets[cat] || 0;
-    const spent  = expenses.filter(e => e.category === cat).reduce((s, e) => s + e.amount, 0);
-    const left   = budget - spent;
-    const pct    = budget > 0 ? Math.min(spent / budget * 100, 100) : (spent > 0 ? 100 : 0);
-    const st     = pct >= 100 ? 'over' : pct >= 80 ? 'warn' : 'ok';
-    html += `
-      <div class="card cat-card">
-        <div class="cat-header">
-          <div class="cat-name"><span style="font-size:21px">${ICONS[cat]}</span><span>${cat}</span></div>
-          <div class="amount-group">
-            <div class="remaining-amount ${st}">${yen(left)}</div>
-            <div class="spent-label">${yen(spent)} 使用 ／ ${yen(budget)}</div>
-          </div>
+  h += '<div class="sec-title">カテゴリ別残額</div>';
+  CATS.forEach(c => {
+    const b = budgets[c]||0;
+    const s = expenses.filter(e=>e.category===c).reduce((x,e)=>x+e.amount,0);
+    const l = b - s;
+    const p = b > 0 ? Math.min(s/b*100,100) : (s>0?100:0);
+    const st = p>=100?'over':p>=80?'warn':'ok';
+    h += `<div class="card cat-card">
+      <div class="cat-header">
+        <div class="cat-name"><span style="font-size:21px">${ICONS[c]}</span><span>${c}</span></div>
+        <div class="ag">
+          <div class="ra ${st}">${yen(l)}</div>
+          <div class="sl">${yen(s)} 使用 ／ ${yen(b)}</div>
         </div>
-        <div class="progress-bar"><div class="progress-fill ${st}" style="width:${pct}%"></div></div>
-      </div>`;
+      </div>
+      <div class="pb"><div class="pf ${st}" style="width:${p}%"></div></div>
+    </div>`;
   });
-
-  setContent(html);
+  setContent(h);
 }
 
-// ─── 支出入力タブ ─────────────────────────────────────────
+// ═══════════════════════════════════════════════
+//  支出入力タブ
+// ═══════════════════════════════════════════════
 function renderAdd() {
-  const catBtns = CATS.map(c => `
-    <button class="cat-pick-btn ${selCat === c ? 'selected' : ''}" onclick="pickCat('${c}')">
-      <span class="pick-icon">${ICONS[c]}</span><span>${c}</span>
-    </button>`).join('');
+  const cats = CATS.map(c => `<button class="cpb ${selCat===c?'sel':''}" onclick="pickCat('${c}')">
+    <span class="pi">${ICONS[c]}</span><span>${c}</span>
+  </button>`).join('');
 
-  const recent = expenses.slice(0, 5);
-  const recentHtml = recent.length === 0 ? '' : `
-    <div class="section-title" style="margin-top:8px">直近の支出</div>
-    <div class="card">${recent.map(e => `
-      <div class="history-item">
-        <div class="history-left">
-          <div class="history-icon-wrap">${ICONS[e.category]}</div>
-          <div>
-            <div class="history-cat">${e.category}</div>
-            ${e.memo ? `<div class="history-memo">${e.memo}</div>` : ''}
-          </div>
-        </div>
-        <div class="history-right">
-          <div class="history-amount">-${yen(e.amount)}</div>
-          <div class="history-date">${fmtDate(e.expense_date)}</div>
-        </div>
-      </div>`).join('')}
-    </div>`;
+  const rec = expenses.slice(0,5);
+  const recHtml = rec.length===0 ? '' : `<div class="sec-title" style="margin-top:8px">直近の支出</div>
+    <div class="card">${rec.map(e=>`<div class="hi">
+      <div class="hl">
+        <div class="hiw">${ICONS[e.category]}</div>
+        <div><div class="hcat">${e.category}</div>${e.memo?`<div class="hmemo">${e.memo}</div>`:''}</div>
+      </div>
+      <div class="hr"><div class="hamt">-${yen(e.amount)}</div><div class="hdate">${fdate(e.expense_date)}</div></div>
+    </div>`).join('')}</div>`;
 
-  setContent(`
-    <div class="card">
-      <div class="form-group">
-        <div class="form-label">カテゴリ</div>
-        <div class="cat-grid">${catBtns}</div>
-      </div>
-      <div class="form-group">
-        <div class="form-label">金額（円）</div>
-        <input type="number" class="form-input amount-input" id="inp-amount"
-               placeholder="0" inputmode="numeric" pattern="[0-9]*" min="1">
-      </div>
-      <div class="form-group">
-        <div class="form-label">メモ（任意）</div>
-        <input type="text" class="form-input" id="inp-memo" placeholder="例：スーパーで購入">
-      </div>
-      <div class="form-group" style="margin-bottom:20px">
-        <div class="form-label">日付</div>
-        <input type="date" class="form-input" id="inp-date" value="${today()}">
-      </div>
-      <button class="btn-primary" id="btn-submit" onclick="submitExpense()">支出を記録する</button>
+  setContent(`<div class="card">
+    <div class="fg"><div class="fl">カテゴリ</div><div class="cat-grid">${cats}</div></div>
+    <div class="fg"><div class="fl">金額（円）</div>
+      <input type="number" class="fi ai" id="ia" placeholder="0" inputmode="numeric" pattern="[0-9]*" min="1">
     </div>
-    ${recentHtml}`);
+    <div class="fg"><div class="fl">メモ（任意）</div>
+      <input type="text" class="fi" id="im" placeholder="例：スーパーで購入">
+    </div>
+    <div class="fg" style="margin-bottom:20px"><div class="fl">日付</div>
+      <input type="date" class="fi" id="id" value="${today()}">
+    </div>
+    <button class="btn" id="bs" onclick="submitExp()">支出を記録する</button>
+  </div>${recHtml}`);
 }
 
 function pickCat(c) {
   selCat = c;
-  document.querySelectorAll('.cat-pick-btn').forEach(b => {
-    b.classList.toggle('selected', b.querySelector('span:last-child').textContent === c);
+  document.querySelectorAll('.cpb').forEach(b => {
+    b.classList.toggle('sel', b.querySelector('span:last-child').textContent === c);
   });
-  document.getElementById('inp-amount').focus();
+  document.getElementById('ia').focus();
 }
 
-async function submitExpense() {
-  const amEl  = document.getElementById('inp-amount');
-  const moEl  = document.getElementById('inp-memo');
-  const dtEl  = document.getElementById('inp-date');
-  const btn   = document.getElementById('btn-submit');
-  const amount = parseInt(amEl.value);
-  const memo   = moEl.value.trim();
-  const date   = dtEl.value;
-
-  if (!selCat)              { toast('カテゴリを選んでください'); return; }
-  if (!amount || amount < 1){ toast('金額を入力してください'); amEl.focus(); return; }
-  if (!date)                { toast('日付を選択してください'); return; }
-
-  const d = new Date(date);
-  const ey = d.getFullYear(), em = d.getMonth() + 1;
-
-  btn.disabled = true; btn.textContent = '記録中…';
+async function submitExp() {
+  const ae=document.getElementById('ia'), me=document.getElementById('im'),
+        de=document.getElementById('id'), btn=document.getElementById('bs');
+  const amount=parseInt(ae.value), memo=me.value.trim(), date=de.value;
+  if (!selCat)           { toast('カテゴリを選んでください'); return; }
+  if (!amount||amount<1) { toast('金額を入力してください'); ae.focus(); return; }
+  if (!date)             { toast('日付を選択してください'); return; }
+  const d=new Date(date), ey=d.getFullYear(), em=d.getMonth()+1;
+  btn.disabled=true; btn.textContent='記録中…';
   try {
-    await api('POST', '/expenses', {
-      year: ey, month: em, category: selCat,
-      amount, memo: memo || null, expense_date: date
-    });
-    toast(ICONS[selCat] + ' ' + selCat + ' ' + yen(amount) + ' を記録しました');
-    amEl.value = ''; moEl.value = '';
-    if (ey === yr && em === mo) {
-      expenses = await api('GET', '/expenses?select=*&year=eq.' + yr + '&month=eq.' + mo + '&order=expense_date.desc,created_at.desc');
-    }
+    await apiPost('/expenses', {year:ey,month:em,category:selCat,amount,memo:memo||null,expense_date:date});
+    toast(ICONS[selCat]+' '+selCat+' '+yen(amount)+' を記録しました');
+    ae.value=''; me.value='';
+    if (ey===yr&&em===mo) expenses=await apiGet('/expenses?select=*&year=eq.'+yr+'&month=eq.'+mo+'&order=expense_date.desc,created_at.desc');
     renderAdd();
-  } catch (err) {
-    toast('エラー: ' + err.message);
-  }
-  btn.disabled = false; btn.textContent = '支出を記録する';
+  } catch(err) { toast('エラー: '+err.message); }
+  btn.disabled=false; btn.textContent='支出を記録する';
 }
 
-// ─── 予算設定タブ ─────────────────────────────────────────
+// ═══════════════════════════════════════════════
+//  予算設定タブ
+// ═══════════════════════════════════════════════
 function renderBudget() {
-  const total = CATS.reduce((s, c) => s + (budgets[c] || 0), 0);
-  const rows = CATS.map(c => `
-    <div class="budget-row">
-      <div class="budget-cat-info"><span style="font-size:22px">${ICONS[c]}</span><span>${c}</span></div>
-      <div class="budget-input-wrap">
-        <input type="number" class="budget-num-input" id="bgt-${c}"
-               value="${budgets[c] || ''}" placeholder="0" inputmode="numeric" pattern="[0-9]*">
-      </div>
-    </div>`).join('');
+  const tot = CATS.reduce((s,c)=>s+(budgets[c]||0),0);
+  const rows = CATS.map(c=>`<div class="br">
+    <div class="bci"><span style="font-size:22px">${ICONS[c]}</span><span>${c}</span></div>
+    <div class="biw"><input type="number" class="bi" id="bg-${c}" value="${budgets[c]||''}" placeholder="0" inputmode="numeric" pattern="[0-9]*"></div>
+  </div>`).join('');
 
-  setContent(`
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:15px;font-weight:700">${yr}年${mo}月の予算</div>
-        <div style="font-size:12px;color:#9CA3AF" id="bgt-total">合計 ${yen(total)}</div>
-      </div>
-      ${rows}
-    </div>
-    <button class="btn-primary" id="btn-save" onclick="saveBudgets()">予算を保存する</button>
+  setContent(`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:15px;font-weight:700">${yr}年${mo}月の予算</div>
+      <div style="font-size:12px;color:#9CA3AF" id="btot">合計 ${yen(tot)}</div>
+    </div>${rows}</div>
+    <button class="btn" id="bsave" onclick="saveBudgets()">予算を保存する</button>
     <p style="text-align:center;font-size:12px;color:#9CA3AF;margin-top:14px">
-      前月の予算をコピー：<button class="btn-text" onclick="copyLastMonth()">コピーする</button>
+      前月の予算をコピー：<button class="btn-txt" onclick="copyLastMonth()">コピーする</button>
     </p>`);
 
   CATS.forEach(c => {
-    document.getElementById('bgt-' + c).addEventListener('input', () => {
-      const t = CATS.reduce((s, x) => s + (parseInt(document.getElementById('bgt-' + x).value) || 0), 0);
-      document.getElementById('bgt-total').textContent = '合計 ' + yen(t);
+    document.getElementById('bg-'+c).addEventListener('input', () => {
+      const t=CATS.reduce((s,x)=>s+(parseInt(document.getElementById('bg-'+x).value)||0),0);
+      document.getElementById('btot').textContent='合計 '+yen(t);
     });
   });
 }
 
 async function saveBudgets() {
-  const btn = document.getElementById('btn-save');
-  btn.disabled = true; btn.textContent = '保存中…';
-  const rows = CATS.map(c => ({
-    year: yr, month: mo, category: c,
-    amount: parseInt(document.getElementById('bgt-' + c).value) || 0
-  }));
+  const btn=document.getElementById('bsave');
+  btn.disabled=true; btn.textContent='保存中…';
+  const rows=CATS.map(c=>({year:yr,month:mo,category:c,amount:parseInt(document.getElementById('bg-'+c).value)||0}));
   try {
-    await api('POST', '/budgets?on_conflict=year,month,category', rows);
-    rows.forEach(r => { budgets[r.category] = r.amount; });
-    toast('予算を保存しました');
-    renderBudget();
-  } catch (err) {
-    toast('エラー: ' + err.message);
-  }
-  btn.disabled = false; btn.textContent = '予算を保存する';
+    await apiPost('/budgets?on_conflict=year,month,category', rows, 'resolution=merge-duplicates,return=minimal');
+    rows.forEach(r=>{budgets[r.category]=r.amount;});
+    toast('予算を保存しました'); renderBudget();
+  } catch(err) { toast('エラー: '+err.message); }
+  btn.disabled=false; btn.textContent='予算を保存する';
 }
 
 async function copyLastMonth() {
-  let py = yr, pm = mo - 1;
-  if (pm < 1) { pm = 12; py--; }
+  let py=yr, pm=mo-1;
+  if(pm<1){pm=12;py--;}
   try {
-    const data = await api('GET', '/budgets?select=*&year=eq.' + py + '&month=eq.' + pm);
-    if (!data.length) { toast('前月の予算データがありません'); return; }
-    data.forEach(b => {
-      const el = document.getElementById('bgt-' + b.category);
-      if (el) el.value = b.amount;
-    });
-    const t = CATS.reduce((s, c) => s + (parseInt(document.getElementById('bgt-' + c).value) || 0), 0);
-    document.getElementById('bgt-total').textContent = '合計 ' + yen(t);
+    const data=await apiGet('/budgets?select=*&year=eq.'+py+'&month=eq.'+pm);
+    if(!data.length){toast('前月の予算データがありません');return;}
+    data.forEach(b=>{const el=document.getElementById('bg-'+b.category);if(el)el.value=b.amount;});
+    const t=CATS.reduce((s,c)=>s+(parseInt(document.getElementById('bg-'+c).value)||0),0);
+    document.getElementById('btot').textContent='合計 '+yen(t);
     toast('前月の予算をコピーしました');
-  } catch (err) {
-    toast('エラー: ' + err.message);
-  }
+  } catch(err){toast('エラー: '+err.message);}
 }
 
-// ─── 履歴タブ ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+//  履歴タブ
+// ═══════════════════════════════════════════════
 async function renderHistory() {
   setContent('<div class="loading"><div class="spinner"></div></div>');
-  const months = [];
-  for (let i = 0; i < 6; i++) {
-    let m = mo - i, y = yr;
-    if (m < 1) { m += 12; y--; }
-    months.push({ y, m });
-  }
-  const results = await Promise.all(
-    months.map(({ y, m }) =>
-      api('GET', '/expenses?select=*&year=eq.' + y + '&month=eq.' + m + '&order=expense_date.desc,created_at.desc')
-        .catch(() => [])
-    )
-  );
-
-  let html = '';
-  results.forEach((items, i) => {
-    if (!items.length) return;
-    const { y, m } = months[i];
-    const total = items.reduce((s, e) => s + e.amount, 0);
-    const open  = i === 0;
-    html += `
-      <div class="card" style="padding:0 16px">
-        <div class="month-section-header" onclick="toggleSec('sec-${y}-${m}',this)">
-          <div class="month-section-title">${y}年${m}月</div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <span class="month-section-total">-${yen(total)}</span>
-            <span style="font-size:12px;color:#9CA3AF">${open ? '▾' : '▸'}</span>
+  const months=[];
+  for(let i=0;i<6;i++){let m=mo-i,y=yr;if(m<1){m+=12;y--;}months.push({y,m});}
+  const results=await Promise.all(months.map(({y,m})=>
+    apiGet('/expenses?select=*&year=eq.'+y+'&month=eq.'+m+'&order=expense_date.desc,created_at.desc').catch(()=>[])
+  ));
+  let h='';
+  results.forEach((items,i)=>{
+    if(!items.length)return;
+    const{y,m}=months[i], tot=items.reduce((s,e)=>s+e.amount,0), open=i===0;
+    h+=`<div class="card" style="padding:0 16px">
+      <div class="msh" onclick="toggleSec('ms-${y}-${m}',this)">
+        <div class="mst">${y}年${m}月</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="mstot">-${yen(tot)}</span>
+          <span style="font-size:12px;color:#9CA3AF">${open?'▾':'▸'}</span>
+        </div>
+      </div>
+      <div id="ms-${y}-${m}" style="${open?'':'display:none'}">
+        ${items.map(e=>`<div class="hi">
+          <div class="hl">
+            <div class="hiw">${ICONS[e.category]}</div>
+            <div><div class="hcat">${e.category}</div>${e.memo?`<div class="hmemo">${e.memo}</div>`:''}</div>
           </div>
-        </div>
-        <div id="sec-${y}-${m}" style="${open ? '' : 'display:none'}">
-          ${items.map(e => `
-            <div class="history-item">
-              <div class="history-left">
-                <div class="history-icon-wrap">${ICONS[e.category]}</div>
-                <div>
-                  <div class="history-cat">${e.category}</div>
-                  ${e.memo ? `<div class="history-memo">${e.memo}</div>` : ''}
-                </div>
-              </div>
-              <div style="display:flex;align-items:center">
-                <div class="history-right">
-                  <div class="history-amount">-${yen(e.amount)}</div>
-                  <div class="history-date">${fmtDate(e.expense_date)}</div>
-                </div>
-                <button class="history-delete" onclick="delExp('${e.id}',${y},${m})">✕</button>
-              </div>
-            </div>`).join('')}
-        </div>
-      </div>`;
+          <div style="display:flex;align-items:center">
+            <div class="hr"><div class="hamt">-${yen(e.amount)}</div><div class="hdate">${fdate(e.expense_date)}</div></div>
+            <button class="hdel" onclick="delExp('${e.id}',${y},${m})">✕</button>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
   });
-
-  if (!html) html = '<div class="empty-state"><div class="empty-icon">📋</div><div>まだ支出の記録がありません</div></div>';
-  setContent(html);
+  if(!h)h='<div class="empty"><div class="empty-icon">📋</div><div>まだ支出の記録がありません</div></div>';
+  setContent(h);
 }
 
-function toggleSec(id, hdr) {
-  const el  = document.getElementById(id);
-  const tog = hdr.querySelector('span:last-child');
-  const show = el.style.display === 'none';
-  el.style.display = show ? '' : 'none';
-  tog.textContent  = show ? '▾' : '▸';
+function toggleSec(id,hdr){
+  const el=document.getElementById(id),tog=hdr.querySelector('span:last-child');
+  const show=el.style.display==='none';
+  el.style.display=show?'':'none'; tog.textContent=show?'▾':'▸';
 }
 
-async function delExp(id, ey, em) {
-  if (!confirm('この支出を削除しますか？')) return;
-  try {
-    await api('DELETE', '/expenses?id=eq.' + id);
-    if (ey === yr && em === mo) expenses = expenses.filter(e => e.id !== id);
-    toast('削除しました');
-    renderHistory();
-  } catch (err) {
-    toast('削除失敗: ' + err.message);
-  }
+async function delExp(id,ey,em){
+  if(!confirm('この支出を削除しますか？'))return;
+  try{
+    await apiDel('/expenses?id=eq.'+id);
+    if(ey===yr&&em===mo)expenses=expenses.filter(e=>e.id!==id);
+    toast('削除しました'); renderHistory();
+  }catch(err){toast('削除失敗: '+err.message);}
 }
 
-// ─── ユーティリティ ───────────────────────────────────────
-function yen(n) {
-  return (n < 0 ? '-¥' : '¥') + Math.abs(n || 0).toLocaleString('ja-JP');
-}
-function fmtDate(s) {
-  if (!s) return '';
-  const d = new Date(s + 'T00:00:00');
-  return (d.getMonth() + 1) + '/' + d.getDate();
-}
-function today() {
-  const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-}
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 2800);
-}
+// ═══════════════════════════════════════════════
+//  ユーティリティ
+// ═══════════════════════════════════════════════
+function yen(n){return(n<0?'-¥':'¥')+Math.abs(n||0).toLocaleString('ja-JP');}
+function fdate(s){if(!s)return'';const d=new Date(s+'T00:00:00');return(d.getMonth()+1)+'/'+d.getDate();}
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2800);}
 
 init();
 </script>
