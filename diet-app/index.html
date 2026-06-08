@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f7a8a0">
+<title>同窓会ダイエット</title>
+<style>
+  :root{
+    --accent:#f48a83;
+    --accent-soft:#fde7e4;
+    --bg:#fbf7f6;
+    --card:#ffffff;
+    --text:#3d3637;
+    --sub:#9a8e8e;
+    --line:#efe6e4;
+    --good:#5fb98e;
+    --warn:#e7a23c;
+    --shadow:0 2px 10px rgba(180,140,135,.12);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+    background:var(--bg);color:var(--text);
+    padding-bottom:78px;font-size:15px;line-height:1.6;
+  }
+  header{
+    background:linear-gradient(135deg,#f7a8a0,#f48a83);
+    color:#fff;padding:16px 18px 14px;position:sticky;top:0;z-index:5;
+  }
+  header h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.02em}
+  header .sub{font-size:12px;opacity:.92;margin-top:2px}
+  main{padding:14px 14px 10px;max-width:560px;margin:0 auto}
+  .view{display:none}
+  .view.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .card{
+    background:var(--card);border-radius:16px;padding:16px;margin-bottom:13px;
+    box-shadow:var(--shadow);
+  }
+  .card h2{margin:0 0 12px;font-size:15px;display:flex;align-items:center;gap:7px}
+  .card h2 .em{font-size:17px}
+  /* dashboard */
+  .hero{text-align:center;padding:20px 16px}
+  .hero .days{font-size:13px;color:var(--sub)}
+  .hero .days b{color:var(--accent);font-size:28px;font-weight:800;margin:0 3px}
+  .nums{display:flex;justify-content:space-around;margin-top:14px}
+  .nums .n{flex:1}
+  .nums .n .v{font-size:24px;font-weight:800}
+  .nums .n .l{font-size:11px;color:var(--sub);margin-top:2px}
+  .nums .sep{width:1px;background:var(--line)}
+  .progress{height:12px;background:var(--accent-soft);border-radius:99px;overflow:hidden;margin-top:16px}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,#f7a8a0,#f48a83);border-radius:99px;transition:width .5s}
+  .progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:6px}
+  /* today summary chips */
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .chip{background:var(--accent-soft);border-radius:13px;padding:11px 12px}
+  .chip .t{font-size:11px;color:var(--sub)}
+  .chip .v{font-size:18px;font-weight:800;margin-top:2px}
+  .chip .v small{font-size:11px;font-weight:600;color:var(--sub)}
+  .bar{height:7px;background:#fff;border-radius:99px;overflow:hidden;margin-top:7px}
+  .bar > i{display:block;height:100%;background:var(--good);border-radius:99px}
+  /* inputs */
+  label.fld{display:block;font-size:12px;color:var(--sub);margin:0 0 4px}
+  input,select,textarea{
+    font-family:inherit;font-size:15px;width:100%;padding:11px 12px;
+    border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--text);
+  }
+  input:focus,select,textarea:focus{outline:none;border-color:var(--accent)}
+  textarea{resize:vertical;min-height:46px}
+  .row{display:flex;gap:9px}
+  .row > div{flex:1}
+  .btn{
+    background:var(--accent);color:#fff;border:none;border-radius:11px;
+    padding:12px;font-size:15px;font-weight:700;width:100%;margin-top:11px;cursor:pointer;
+  }
+  .btn:active{opacity:.85}
+  .btn.ghost{background:#fff;color:var(--accent);border:1.5px solid var(--accent)}
+  .seg{display:flex;gap:7px;margin-bottom:10px}
+  .seg button{
+    flex:1;padding:9px 4px;border:1px solid var(--line);background:#fff;border-radius:10px;
+    font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit;
+  }
+  .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  /* list */
+  .list{list-style:none;margin:0;padding:0}
+  .list li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+  .list li:first-child{border-top:none}
+  .list .ic{width:34px;height:34px;border-radius:10px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .list .meta{flex:1;min-width:0}
+  .list .meta .ttl{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .list .meta .dsc{font-size:11px;color:var(--sub)}
+  .list .del{color:#d9b3b0;font-size:19px;background:none;border:none;cursor:pointer;padding:4px 6px}
+  .empty{text-align:center;color:var(--sub);font-size:13px;padding:18px 0}
+  .datepick{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .datepick input{flex:1}
+  .arw{background:#fff;border:1px solid var(--line);border-radius:10px;width:38px;height:40px;font-size:16px;color:var(--sub);cursor:pointer}
+  /* habit toggles */
+  .habit{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line)}
+  .habit:first-of-type{border-top:none}
+  .habit .nm{font-size:14px}
+  .tg{width:48px;height:28px;border-radius:99px;background:#e7dedd;position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+  .tg.on{background:var(--good)}
+  .tg::after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .tg.on::after{left:23px}
+  .water-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+  .cup{width:38px;height:46px;border:2px solid var(--line);border-radius:5px 5px 11px 11px;cursor:pointer;background:#fff;position:relative;overflow:hidden}
+  .cup.full{border-color:#7ec1e6}
+  .cup.full::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70%;background:linear-gradient(#acdcf2,#7ec1e6)}
+  /* nav */
+  nav{
+    position:fixed;left:0;right:0;bottom:0;background:#fff;display:flex;
+    border-top:1px solid var(--line);z-index:6;padding-bottom:env(safe-area-inset-bottom)
+  }
+  nav button{
+    flex:1;background:none;border:none;padding:9px 2px 8px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--sub);font-family:inherit
+  }
+  nav button .ni{font-size:20px;line-height:1}
+  nav button .nl{font-size:10px;font-weight:600}
+  nav button.on{color:var(--accent)}
+  .tip{font-size:12px;color:var(--sub);background:var(--accent-soft);border-radius:11px;padding:10px 12px;margin-top:4px}
+  svg text{font-family:inherit}
+  .mini{font-size:11px;color:var(--sub);margin-top:8px;text-align:center}
+  /* おすすめ運動 */
+  .rec-head{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+  .rec-head .day{font-size:13px;color:var(--sub)}
+  .rec-head .ttl{font-size:16px;font-weight:800}
+  .rec-note{font-size:12px;color:var(--sub);margin-bottom:11px}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{
+    display:flex;align-items:center;gap:6px;background:var(--accent-soft);
+    border:none;border-radius:99px;padding:8px 13px;font-size:13px;font-weight:600;
+    color:var(--text);cursor:pointer;font-family:inherit
+  }
+  .pill .pe{font-size:15px}
+  .pill .q{font-size:11px;color:var(--accent);font-weight:700}
+  .rest-box{display:flex;align-items:center;gap:11px;background:var(--accent-soft);border-radius:13px;padding:13px}
+  .rest-box .re{font-size:26px}
+  .rest-box .rt{font-size:14px;font-weight:700}
+  .rest-box .rd{font-size:12px;color:var(--sub)}
+  /* モーダル（やり方ガイド） */
+  .modal{position:fixed;inset:0;background:rgba(60,40,40,.5);z-index:20;display:none;align-items:flex-end;justify-content:center}
+  .modal.show{display:flex;animation:fade .2s}
+  .sheet{background:#fff;width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto;animation:up .25s ease}
+  @keyframes up{from{transform:translateY(40px)}to{transform:none}}
+  .sheet .gh{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+  .sheet .gh .ge{font-size:30px}
+  .sheet .gh .gt{font-size:19px;font-weight:800}
+  .sheet .gtag{display:inline-block;font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:3px 10px;margin-bottom:13px}
+  .sheet ol{margin:0 0 14px;padding-left:20px}
+  .sheet ol li{margin-bottom:7px;font-size:14px}
+  .sheet .greps{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:11px;padding:11px 13px;margin-bottom:11px;font-size:14px;font-weight:700}
+  .sheet .gtip{font-size:12.5px;color:#7a6f6f;background:#fff6ec;border:1px solid #f3e2cb;border-radius:11px;padding:11px 13px;margin-bottom:14px}
+  .sheet .gtip b{color:var(--warn)}
+  .sheet .gclose{background:#f1e9e8;color:var(--sub)}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="hdrTitle">ホーム</h1>
+  <div class="sub" id="hdrSub">8月15日の同窓会まで、あと一歩</div>
+</header>
+
+<main>
+  <!-- ============ HOME ============ -->
+  <section class="view active" id="v-home">
+    <div class="card hero">
+      <div class="days">同窓会まで <b id="daysLeft">--</b> 日</div>
+      <div class="nums">
+        <div class="n"><div class="v" id="curW">--</div><div class="l">現在 (kg)</div></div>
+        <div class="sep"></div>
+        <div class="n"><div class="v" id="toGo">--</div><div class="l">目標まで (kg)</div></div>
+        <div class="sep"></div>
+        <div class="n"><div class="v" id="avg7">--</div><div class="l">7日平均</div></div>
+      </div>
+      <div class="progress"><i id="progBar" style="width:0%"></i></div>
+      <div class="progress-label"><span id="startLbl">53.0kg</span><span id="goalLbl">目標 49.0kg</span></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="em">📉</span>体重の推移</h2>
+      <div id="chart"></div>
+      <div class="mini" id="chartNote"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="em">📅</span>今日の記録</h2>
+      <div class="chips">
+        <div class="chip">
+          <div class="t">タンパク質</div>
+          <div class="v"><span id="cProt">0</span><small> / <span id="protGoal">60</span>g</small></div>
+          <div class="bar"><i id="cProtBar" style="width:0%"></i></div>
+        </div>
+        <div class="chip">
+          <div class="t">水分</div>
+          <div class="v"><span id="cWater">0</span><small> / <span id="waterGoal">8</span>杯</small></div>
+          <div class="bar"><i id="cWaterBar" style="width:0%;background:#7ec1e6"></i></div>
+        </div>
+        <div class="chip">
+          <div class="t">運動</div>
+          <div class="v"><span id="cEx">0</span><small> 分</small></div>
+        </div>
+        <div class="chip">
+          <div class="t">むくみ対策</div>
+          <div class="v"><span id="cHabit">0</span><small> / 3</small></div>
+        </div>
+      </div>
+      <div class="tip" id="dailyTip"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="em">📋</span>今日のおすすめ運動</h2>
+      <div id="homeRecBody"></div>
+    </div>
+  </section>
+
+  <!-- ============ WEIGHT ============ -->
+  <section class="view" id="v-weight">
+    <div class="card">
+      <h2><span class="em">⚖️</span>体重を記録</h2>
+      <div class="datepick">
+        <button class="arw" data-nav="w" data-dir="-1">‹</button>
+        <input type="date" id="wDate">
+        <button class="arw" data-nav="w" data-dir="1">›</button>
+      </div>
+      <label class="fld">体重 (kg)・朝イチ／トイレ後がおすすめ</label>
+      <input type="number" id="wVal" step="0.1" inputmode="decimal" placeholder="例: 52.4">
+      <button class="btn" id="wSave">保存する</button>
+    </div>
+    <div class="card">
+      <h2><span class="em">📜</span>記録一覧</h2>
+      <ul class="list" id="wList"></ul>
+    </div>
+  </section>
+
+  <!-- ============ MEAL ============ -->
+  <section class="view" id="v-meal">
+    <div class="card">
+      <h2><span class="em">🍽️</span>食べたものを記録</h2>
+      <div class="datepick">
+        <button class="arw" data-nav="m" data-dir="-1">‹</button>
+        <input type="date" id="mDate">
+        <button class="arw" data-nav="m" data-dir="1">›</button>
+      </div>
+      <div class="seg" id="mTypeSeg">
+        <button data-t="朝" class="on">朝</button>
+        <button data-t="昼">昼</button>
+        <button data-t="夜">夜</button>
+        <button data-t="間食">間食</button>
+      </div>
+      <label class="fld">メニュー</label>
+      <input type="text" id="mName" placeholder="例: 鮭の塩焼き定食">
+      <div class="row" style="margin-top:10px">
+        <div>
+          <label class="fld">カロリー (任意)</label>
+          <input type="number" id="mKcal" inputmode="numeric" placeholder="kcal">
+        </div>
+        <div>
+          <label class="fld">タンパク質 (任意)</label>
+          <input type="number" id="mProt" inputmode="numeric" placeholder="g">
+        </div>
+      </div>
+      <button class="btn" id="mSave">追加する</button>
+      <div class="tip">手のひら1枚分の肉・魚・卵・大豆で約15〜20g。ざっくりでOKです。</div>
+    </div>
+    <div class="card">
+      <h2><span class="em">🗒️</span><span id="mListDate">今日</span>の食事</h2>
+      <div class="chips" style="margin-bottom:12px">
+        <div class="chip"><div class="t">合計カロリー</div><div class="v"><span id="mKcalSum">0</span><small> kcal</small></div></div>
+        <div class="chip"><div class="t">タンパク質</div><div class="v"><span id="mProtSum">0</span><small> g</small></div></div>
+      </div>
+      <ul class="list" id="mList"></ul>
+    </div>
+  </section>
+
+  <!-- ============ EXERCISE ============ -->
+  <section class="view" id="v-ex">
+    <div class="card" id="recCard">
+      <h2><span class="em">📋</span>おすすめメニュー</h2>
+      <div id="recBody"></div>
+    </div>
+    <div class="card">
+      <h2><span class="em">🏃‍♀️</span>運動を記録</h2>
+      <div class="datepick">
+        <button class="arw" data-nav="e" data-dir="-1">‹</button>
+        <input type="date" id="eDate">
+        <button class="arw" data-nav="e" data-dir="1">›</button>
+      </div>
+      <label class="fld">種目</label>
+      <select id="eName">
+        <option>ピラティス</option>
+        <option>スクワット</option>
+        <option>ヒップリフト</option>
+        <option>プランク</option>
+        <option>デッドバグ</option>
+        <option>腕立て（膝つき）</option>
+        <option>ウォーキング</option>
+        <option>体幹トレ</option>
+        <option>その他</option>
+      </select>
+      <div class="row" style="margin-top:10px">
+        <div>
+          <label class="fld">時間 (分)</label>
+          <input type="number" id="eMin" inputmode="numeric" placeholder="例: 20">
+        </div>
+        <div>
+          <label class="fld">歩数 (任意)</label>
+          <input type="number" id="eSteps" inputmode="numeric" placeholder="例: 8000">
+        </div>
+      </div>
+      <label class="fld" style="margin-top:10px">メモ (任意)</label>
+      <input type="text" id="eNote" placeholder="例: スクワット20回×3">
+      <button class="btn" id="eSave">追加する</button>
+    </div>
+    <div class="card">
+      <h2><span class="em">💪</span><span id="eListDate">今日</span>の運動</h2>
+      <ul class="list" id="eList"></ul>
+    </div>
+  </section>
+
+  <!-- ============ HABIT ============ -->
+  <section class="view" id="v-habit">
+    <div class="card">
+      <h2><span class="em">💧</span>水分</h2>
+      <div class="datepick">
+        <button class="arw" data-nav="h" data-dir="-1">‹</button>
+        <input type="date" id="hDate">
+        <button class="arw" data-nav="h" data-dir="1">›</button>
+      </div>
+      <div>コップ1杯=約200ml。目標は1日8杯 (約1.5〜2L)</div>
+      <div class="water-row" id="waterRow"></div>
+    </div>
+    <div class="card">
+      <h2><span class="em">😴</span>睡眠・むくみ対策</h2>
+      <label class="fld">睡眠時間</label>
+      <input type="number" id="hSleep" step="0.5" inputmode="decimal" placeholder="例: 7">
+      <div style="margin-top:14px">
+        <div class="habit"><span class="nm">🧂 減塩を意識した</span><div class="tg" data-habit="salt"></div></div>
+        <div class="habit"><span class="nm">🍷 お酒を控えた</span><div class="tg" data-habit="alcohol"></div></div>
+        <div class="habit"><span class="nm">🥗 主食を半分にした</span><div class="tg" data-habit="carb"></div></div>
+      </div>
+      <button class="btn" id="hSave">保存する</button>
+      <div class="tip">顔のスッキリ感は「減塩＋水分＋睡眠」のむくみ取りで短期間でも変わります。</div>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="guideModal">
+  <div class="sheet" id="guideSheet"></div>
+</div>
+
+<nav id="nav">
+  <button data-v="home" class="on"><span class="ni">🏠</span><span class="nl">ホーム</span></button>
+  <button data-v="weight"><span class="ni">⚖️</span><span class="nl">体重</span></button>
+  <button data-v="meal"><span class="ni">🍽️</span><span class="nl">食事</span></button>
+  <button data-v="ex"><span class="ni">💪</span><span class="nl">運動</span></button>
+  <button data-v="habit"><span class="ni">💧</span><span class="nl">習慣</span></button>
+</nav>
+
+<script>
+/* ============ 設定 ============ */
+const CFG = {
+  start: 53.0,
+  goal: 49.0,
+  targetDate: "2026-08-15",
+  proteinGoal: 60,
+  waterGoal: 8
+};
+
+/* ============ Supabase（クラウド保存） ============ */
+// お金管理アプリと同じプロジェクト。ダイエット用テーブル(diet_*)を使用
+const BASE = 'https://ospiyfmijbpvwkwgwhim.supabase.co/rest/v1';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zcGl5Zm1pamJwdndrd2d3aGltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTY3MTMsImV4cCI6MjA5MjAzMjcxM30.rT3C8GDrmQiVGVOxEfWT-1CQ3y0yiAAzA1pvhqHH8wM';
+
+async function apiGet(path){
+  const sep=path.includes('?')?'&':'?';
+  const r=await fetch(BASE+path+sep+'apikey='+KEY);
+  if(!r.ok) throw new Error('HTTP '+r.status+': '+await r.text().catch(()=>r.statusText));
+  return r.json();
+}
+async function apiPost(path, body, prefer){
+  const r=await fetch(BASE+path,{method:'POST',headers:{
+    'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json',
+    'Prefer':prefer||'return=minimal'},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error('HTTP '+r.status+': '+await r.text().catch(()=>r.statusText));
+}
+async function apiDel(path){
+  const sep=path.includes('?')?'&':'?';
+  const r=await fetch(BASE+path+sep+'apikey='+KEY,{method:'DELETE',headers:{'Authorization':'Bearer '+KEY}});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+}
+// 日付キーのテーブル（同じ日付は上書き）
+const apiUpsert=(table,body)=>apiPost('/'+table+'?on_conflict=day', body, 'resolution=merge-duplicates,return=minimal');
+function showErr(e){ console.error(e); alert("通信エラーで保存・読み込みに失敗しました。\nネット接続を確認して、もう一度お試しください。\n\n"+(e&&e.message||e)); }
+
+// 全データをSupabaseから読み込んでメモリ上の構造に展開
+async function loadAll(){
+  const [w,m,e,wa,h]=await Promise.all([
+    apiGet('/diet_weights?select=*'),
+    apiGet('/diet_meals?select=*'),
+    apiGet('/diet_exercises?select=*'),
+    apiGet('/diet_water?select=*'),
+    apiGet('/diet_habits?select=*')
+  ]);
+  weights={}; w.forEach(r=>weights[r.day]=Number(r.value));
+  meals=m.map(r=>({id:r.id,date:r.day,type:r.mtype,name:r.name,kcal:r.kcal||0,prot:r.prot||0}));
+  exers=e.map(r=>({id:r.id,date:r.day,name:r.name,min:r.minutes||0,steps:r.steps||0,note:r.note||''}));
+  water={}; wa.forEach(r=>water[r.day]=r.cups);
+  habits={}; h.forEach(r=>habits[r.day]={sleep:Number(r.sleep)||0,salt:r.salt,alcohol:r.alcohol,carb:r.carb});
+}
+
+let weights={}, meals=[], exers=[], water={}, habits={};
+
+/* ============ ユーティリティ ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const toYMD = dt => dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
+const today = () => toYMD(new Date());
+const uid = () => (self.crypto && crypto.randomUUID) ? crypto.randomUUID()
+  : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:(r&0x3|0x8)).toString(16);});
+function fmtDate(d){
+  const dt = new Date(d+"T00:00:00");
+  const w = "日月火水木金土"[dt.getDay()];
+  return (dt.getMonth()+1)+"/"+dt.getDate()+"("+w+")";
+}
+function shiftDate(d, n){
+  const dt = new Date(d+"T00:00:00"); dt.setDate(dt.getDate()+n);
+  return toYMD(dt);
+}
+function daysBetween(a,b){
+  return Math.round((new Date(b)-new Date(a))/86400000);
+}
+
+/* ============ ナビ ============ */
+const titles = {home:"ホーム",weight:"体重",meal:"食事",ex:"運動",habit:"習慣"};
+$$("#nav button").forEach(b=>b.onclick=()=>{
+  const v=b.dataset.v;
+  $$("#nav button").forEach(x=>x.classList.toggle("on",x===b));
+  $$(".view").forEach(x=>x.classList.remove("active"));
+  $("#v-"+v).classList.add("active");
+  $("#hdrTitle").textContent=titles[v];
+  window.scrollTo(0,0);
+  if(v==="home") renderHome();
+});
+
+/* ============ 体重 ============ */
+$("#wDate").value = today();
+$("#wDate").onchange = renderWeightList;
+$("#wSave").onclick = async ()=>{
+  const d=$("#wDate").value, v=parseFloat($("#wVal").value);
+  if(!d || isNaN(v)) return alert("体重を入力してください");
+  try{ await apiUpsert('diet_weights',{day:d,value:v}); }catch(e){ return showErr(e); }
+  weights[d]=v;
+  $("#wVal").value="";
+  renderWeightList(); renderHome();
+};
+function renderWeightList(){
+  const ul=$("#wList"); ul.innerHTML="";
+  const keys=Object.keys(weights).sort().reverse();
+  if(!keys.length){ ul.innerHTML='<li class="empty">まだ記録がありません</li>'; return; }
+  keys.forEach((d,i)=>{
+    const prev = keys[i+1];
+    let diff="";
+    if(prev){ const dv=(weights[d]-weights[prev]).toFixed(1); diff=(dv>0?"+":"")+dv+"kg"; }
+    const li=document.createElement("li");
+    li.innerHTML=`<div class="ic">⚖️</div>
+      <div class="meta"><div class="ttl">${weights[d].toFixed(1)} kg</div>
+      <div class="dsc">${fmtDate(d)} ${diff?"・前回比 "+diff:""}</div></div>
+      <button class="del">×</button>`;
+    li.querySelector(".del").onclick=async ()=>{ if(confirm("削除しますか？")){ try{ await apiDel('/diet_weights?day=eq.'+d); }catch(e){ return showErr(e); } delete weights[d]; renderWeightList(); renderHome(); } };
+    ul.appendChild(li);
+  });
+}
+
+/* ============ 食事 ============ */
+let mType="朝";
+$("#mDate").value=today();
+$("#mDate").onchange=renderMealList;
+$$("#mTypeSeg button").forEach(b=>b.onclick=()=>{
+  mType=b.dataset.t;
+  $$("#mTypeSeg button").forEach(x=>x.classList.toggle("on",x===b));
+});
+$("#mSave").onclick=async ()=>{
+  const name=$("#mName").value.trim();
+  if(!name) return alert("メニューを入力してください");
+  const id=uid(), d=$("#mDate").value;
+  const kcal=parseInt($("#mKcal").value)||0, prot=parseInt($("#mProt").value)||0;
+  try{ await apiPost('/diet_meals',{id,day:d,mtype:mType,name,kcal,prot}); }catch(e){ return showErr(e); }
+  meals.push({id,date:d,type:mType,name,kcal,prot});
+  $("#mName").value="";$("#mKcal").value="";$("#mProt").value="";
+  renderMealList(); renderHome();
+};
+const mealIcon={朝:"🌅",昼:"☀️",夜:"🌙",間食:"🍪"};
+function renderMealList(){
+  const d=$("#mDate").value;
+  $("#mListDate").textContent = d===today()?"今日":fmtDate(d);
+  const items=meals.filter(m=>m.date===d);
+  const ul=$("#mList"); ul.innerHTML="";
+  let kc=0,pr=0;
+  items.forEach(m=>{kc+=m.kcal;pr+=m.prot;});
+  $("#mKcalSum").textContent=kc; $("#mProtSum").textContent=pr;
+  if(!items.length){ ul.innerHTML='<li class="empty">この日の記録はまだありません</li>'; return; }
+  const order={朝:0,昼:1,夜:2,間食:3};
+  items.sort((a,b)=>order[a.type]-order[b.type]);
+  items.forEach(m=>{
+    const sub=[m.kcal?m.kcal+"kcal":"",m.prot?"P"+m.prot+"g":""].filter(Boolean).join(" ・ ");
+    const li=document.createElement("li");
+    li.innerHTML=`<div class="ic">${mealIcon[m.type]}</div>
+      <div class="meta"><div class="ttl">${m.name}</div>
+      <div class="dsc">${m.type}${sub?" ・ "+sub:""}</div></div>
+      <button class="del">×</button>`;
+    li.querySelector(".del").onclick=async ()=>{ try{ await apiDel('/diet_meals?id=eq.'+m.id); }catch(err){ return showErr(err); } meals=meals.filter(x=>x.id!==m.id); renderMealList(); renderHome(); };
+    ul.appendChild(li);
+  });
+}
+
+/* ============ 運動 ============ */
+$("#eDate").value=today();
+$("#eDate").onchange=()=>{ renderExList(); renderExRec(); };
+$("#eSave").onclick=async ()=>{
+  const min=parseInt($("#eMin").value)||0;
+  const steps=parseInt($("#eSteps").value)||0;
+  if(!min && !steps) return alert("時間か歩数を入力してください");
+  const id=uid(), d=$("#eDate").value, name=$("#eName").value, note=$("#eNote").value.trim();
+  try{ await apiPost('/diet_exercises',{id,day:d,name,minutes:min,steps,note}); }catch(e){ return showErr(e); }
+  exers.push({id,date:d,name,min,steps,note});
+  $("#eMin").value="";$("#eSteps").value="";$("#eNote").value="";
+  renderExList(); renderHome();
+};
+function renderExList(){
+  const d=$("#eDate").value;
+  $("#eListDate").textContent=d===today()?"今日":fmtDate(d);
+  const items=exers.filter(e=>e.date===d);
+  const ul=$("#eList"); ul.innerHTML="";
+  if(!items.length){ ul.innerHTML='<li class="empty">この日の記録はまだありません</li>'; return; }
+  items.forEach(e=>{
+    const sub=[e.min?e.min+"分":"",e.steps?e.steps+"歩":"",e.note].filter(Boolean).join(" ・ ");
+    const li=document.createElement("li");
+    li.innerHTML=`<div class="ic">💪</div>
+      <div class="meta"><div class="ttl">${e.name}</div><div class="dsc">${sub}</div></div>
+      <button class="del">×</button>`;
+    li.querySelector(".del").onclick=async ()=>{ try{ await apiDel('/diet_exercises?id=eq.'+e.id); }catch(err){ return showErr(err); } exers=exers.filter(x=>x.id!==e.id); renderExList(); renderHome(); };
+    ul.appendChild(li);
+  });
+}
+
+/* ============ 曜日別おすすめメニュー ============ */
+// getDay(): 0=日 1=月 2=火 3=水 4=木 5=金 6=土　／ 金曜=ピラティス固定
+const WEEKLY={
+  1:{title:"下半身の日",emoji:"🦵",items:["スクワット","ヒップリフト"],note:"お尻と太ももの大きい筋肉を動かして代謝アップ。"},
+  2:{rest:true,emoji:"🌿",title:"お休みの日",note:"休息 or 軽く散歩（1日8,000歩を目標に）。"},
+  3:{title:"体幹・お腹の日",emoji:"🔥",items:["プランク","デッドバグ"],note:"下腹とお腹の深層を引き締めて、姿勢から細見え。"},
+  4:{rest:true,emoji:"🌿",title:"お休みの日",note:"休息 or 軽く散歩。むくみ取りに歩くのも◎。"},
+  5:{title:"ピラティスの日",emoji:"🧘‍♀️",items:["ピラティス"],fixed:true,note:"いつものピラティス。呼吸を意識してお腹を薄く保って。"},
+  6:{title:"全身の日",emoji:"💪",items:["スクワット","ヒップリフト","腕立て（膝つき）"],note:"下半身＋上半身。週の仕上げにしっかり動かそう。"},
+  0:{rest:true,emoji:"😴",title:"お休みの日",note:"休息して睡眠をしっかり。回復も痩せる大事な時間。"}
+};
+// やり方ガイド
+const EXGUIDE={
+  "スクワット":{emoji:"🦵",tag:"お尻・太もも",reps:"10〜15回 × 2〜3セット",
+    steps:["足を肩幅に開き、つま先は少し外向きに。","椅子に座るようにお尻を後ろへ引きながら下げる。","太ももが床と平行に近づくまで下げる。","かかとで床を押して、ゆっくり立ち上がる。"],
+    tip:"膝とつま先は同じ向きに。膝がつま先より前に出すぎないよう、背中は丸めないこと。"},
+  "ヒップリフト":{emoji:"🍑",tag:"お尻・下腹・体幹",reps:"12〜15回 × 2〜3セット",
+    steps:["仰向けで膝を立て、足は腰幅に開く。","かかとで床を押し、お尻を持ち上げる。","肩〜膝が一直線になったらお尻をギュッと締めて1〜2秒キープ。","ゆっくり下ろす（床にお尻をつけきらない）。"],
+    tip:"腰を反らして上げず、お尻の力で持ち上げるのがポイント。"},
+  "プランク":{emoji:"🪵",tag:"お腹全体・体幹",reps:"20〜30秒 × 2〜3セット",
+    steps:["うつ伏せになり、肘とつま先で体を支える。","肘は肩の真下に置く。","頭〜かかとを一直線にキープ。","お腹を軽く凹ませ、呼吸は止めない。"],
+    tip:"お尻が上がったり腰が落ちたりしないように。きつければ膝をついてもOK。"},
+  "デッドバグ":{emoji:"🐞",tag:"下腹・体幹の深層",reps:"左右交互に10回ずつ × 2セット",
+    steps:["仰向けで両手を天井に伸ばし、股関節と膝を90度に上げる。","右手と左足を同時にゆっくり伸ばし、床ギリギリまで下ろす。","元に戻し、左手と右足で同様に。","これを交互にくり返す。"],
+    tip:"腰を床に押し付けたまま行う。腰が反って浮くと効果が落ちるので注意。"},
+  "腕立て（膝つき）":{emoji:"💪",tag:"二の腕・胸",reps:"8〜12回 × 2セット",
+    steps:["膝をついて、手は肩幅より少し広く床に置く。","膝〜頭を一直線にキープ。","胸を床に近づけるように肘を曲げる。","床を押し返して元に戻す。"],
+    tip:"お尻が突き出ないように体を一直線に。きつければ手を高い台について角度をゆるめる。"},
+  "ピラティス":{emoji:"🧘‍♀️",tag:"体幹・姿勢・しなやかさ",reps:"30分（いつものメニュー）",
+    steps:["いつものピラティスのメニューでOK。","呼吸を意識し、お腹を薄く保ったまま動く。","反動を使わず、ゆっくりコントロールして動かす。"],
+    tip:"毎週の固定メニュー。続けることで体幹と姿勢が整い、見た目が変わります。"},
+  "ウォーキング":{emoji:"🚶‍♀️",tag:"有酸素・むくみ取り",reps:"1日合計8,000歩 / 20〜30分",
+    steps:["背すじを伸ばし、目線はまっすぐ。","腕を軽く振り、歩幅をやや大きめに。","少し息が弾むくらいの早歩きで。"],
+    tip:"通勤・買い物のついでで合計でOK。下半身を動かすとむくみが取れて脚も軽くなります。"}
+};
+function openGuide(key){
+  const g=EXGUIDE[key]; if(!g) return;
+  $("#guideSheet").innerHTML=
+    `<div class="gh"><span class="ge">${g.emoji}</span><span class="gt">${key}</span></div>
+     <span class="gtag">効く部位：${g.tag}</span>
+     <div class="greps">🔁 目安：${g.reps}</div>
+     <ol>${g.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+     <div class="gtip"><b>コツ</b>　${g.tip}</div>
+     <button class="btn" id="gUse">この種目を記録フォームに入れる</button>
+     <button class="btn ghost gclose" id="gClose">閉じる</button>`;
+  $("#guideModal").classList.add("show");
+  $("#gClose").onclick=closeGuide;
+  $("#gUse").onclick=()=>{
+    const sel=$("#eName");
+    if([...sel.options].some(o=>o.value===key)) sel.value=key;
+    closeGuide();
+    $("#eMin").focus();
+    $("#eName").scrollIntoView({behavior:"smooth",block:"center"});
+  };
+}
+function closeGuide(){ $("#guideModal").classList.remove("show"); }
+$("#guideModal").onclick=e=>{ if(e.target.id==="guideModal") closeGuide(); };
+
+function recHTML(d){
+  const wd=new Date(d+"T00:00:00").getDay();
+  const p=WEEKLY[wd];
+  const dayName=["日","月","火","水","木","金","土"][wd]+"曜日";
+  let html=`<div class="rec-head"><span class="day">${d===today()?"今日（"+dayName+"）":dayName}</span><span class="ttl">${p.emoji} ${p.title}</span></div>`;
+  html+=`<div class="rec-note">${p.note}</div>`;
+  if(p.rest){
+    html+=`<div class="rest-box"><span class="re">${p.emoji}</span><div><div class="rt">今日はお休みでOK</div><div class="rd">無理せず、歩くだけでも十分です</div></div></div>`;
+  }else{
+    html+=`<div class="pills">`+
+      p.items.map(k=>`<button class="pill" data-ex="${k}"><span class="pe">${(EXGUIDE[k]||{}).emoji||"💪"}</span>${k}<span class="q">やり方 ›</span></button>`).join("")+
+      `</div>`;
+    if(p.fixed) html+=`<div class="rec-note" style="margin-top:10px">🔒 金曜はピラティス固定です。</div>`;
+  }
+  return html;
+}
+function wireRecPills(container){
+  container.querySelectorAll(".pill").forEach(b=>b.onclick=()=>openGuide(b.dataset.ex));
+}
+function renderExRec(){
+  const c=$("#recBody");
+  c.innerHTML=recHTML($("#eDate").value);
+  wireRecPills(c);
+}
+
+/* ============ 習慣（水分・睡眠・むくみ） ============ */
+$("#hDate").value=today();
+$("#hDate").onchange=renderHabit;
+function renderHabit(){
+  const d=$("#hDate").value;
+  const cups=water[d]||0;
+  const row=$("#waterRow"); row.innerHTML="";
+  for(let i=1;i<=8;i++){
+    const c=document.createElement("div");
+    c.className="cup"+(i<=cups?" full":"");
+    c.onclick=async ()=>{ const nv=(cups===i?i-1:i); try{ await apiUpsert('diet_water',{day:d,cups:nv}); }catch(e){ return showErr(e); } water[d]=nv; renderHabit(); renderHome(); };
+    row.appendChild(c);
+  }
+  const h=habits[d]||{};
+  $("#hSleep").value=h.sleep||"";
+  $$(".tg").forEach(t=>t.classList.toggle("on",!!h[t.dataset.habit]));
+}
+$$(".tg").forEach(t=>t.onclick=()=>t.classList.toggle("on"));
+$("#hSave").onclick=async ()=>{
+  const d=$("#hDate").value;
+  const h=habits[d]||{};
+  h.sleep=parseFloat($("#hSleep").value)||0;
+  $$(".tg").forEach(t=>h[t.dataset.habit]=t.classList.contains("on"));
+  try{ await apiUpsert('diet_habits',{day:d,sleep:h.sleep,salt:!!h.salt,alcohol:!!h.alcohol,carb:!!h.carb}); }catch(e){ return showErr(e); }
+  habits[d]=h; renderHome();
+  alert("保存しました");
+};
+
+/* ============ ホーム ============ */
+function latestWeight(){
+  const keys=Object.keys(weights).sort();
+  return keys.length?weights[keys[keys.length-1]]:null;
+}
+function avg7(){
+  const keys=Object.keys(weights).sort().slice(-7);
+  if(!keys.length) return null;
+  return keys.reduce((s,k)=>s+weights[k],0)/keys.length;
+}
+function renderHome(){
+  const cur=latestWeight();
+  const dleft=Math.max(0,daysBetween(today(),CFG.targetDate));
+  $("#daysLeft").textContent=dleft;
+  $("#curW").textContent=cur!=null?cur.toFixed(1):"--";
+  $("#toGo").textContent=cur!=null?Math.max(0,(cur-CFG.goal)).toFixed(1):"--";
+  const a=avg7();
+  $("#avg7").textContent=a!=null?a.toFixed(1):"--";
+  $("#startLbl").textContent=CFG.start.toFixed(1)+"kg";
+  $("#goalLbl").textContent="目標 "+CFG.goal.toFixed(1)+"kg";
+  // progress: start->goal
+  let pct=0;
+  if(cur!=null){ pct=(CFG.start-cur)/(CFG.start-CFG.goal)*100; pct=Math.max(0,Math.min(100,pct)); }
+  $("#progBar").style.width=pct+"%";
+
+  // today chips
+  const td=today();
+  const tp=meals.filter(m=>m.date===td).reduce((s,m)=>s+m.prot,0);
+  $("#cProt").textContent=tp; $("#protGoal").textContent=CFG.proteinGoal;
+  $("#cProtBar").style.width=Math.min(100,tp/CFG.proteinGoal*100)+"%";
+  const cups=water[td]||0;
+  $("#cWater").textContent=cups; $("#waterGoal").textContent=CFG.waterGoal;
+  $("#cWaterBar").style.width=Math.min(100,cups/CFG.waterGoal*100)+"%";
+  const em=exers.filter(e=>e.date===td).reduce((s,e)=>s+e.min,0);
+  $("#cEx").textContent=em;
+  const h=habits[td]||{};
+  const hc=(h.salt?1:0)+(h.alcohol?1:0)+(h.carb?1:0);
+  $("#cHabit").textContent=hc;
+
+  $("#dailyTip").textContent=makeTip(cur,dleft,tp,cups);
+  const hr=$("#homeRecBody");
+  hr.innerHTML=recHTML(today());
+  wireRecPills(hr);
+  drawChart();
+}
+function makeTip(cur,dleft,prot,cups){
+  if(cur==null) return "まずは今朝の体重を「体重」タブから記録しましょう。スタートを記録すると進捗が見えます。";
+  if(cur<=CFG.goal) return "🎉 目標達成！この調子でキープしていきましょう。";
+  const need=(cur-CFG.goal);
+  const perWeek = dleft>0 ? (need/ (dleft/7)) : need;
+  if(cups<4) return "水分が少なめです。むくみ取り＝顔スッキリのカギ。あと"+(CFG.waterGoal-cups)+"杯を目標に。";
+  if(prot<CFG.proteinGoal*0.6) return "今日のタンパク質が不足ぎみ。次の食事で手のひら1枚分の肉・魚・卵を足しましょう。";
+  return "目標まであと"+need.toFixed(1)+"kg。残り"+dleft+"日なら週"+perWeek.toFixed(1)+"kgペース。無理なくいけます。";
+}
+
+/* ============ グラフ（SVG） ============ */
+function drawChart(){
+  const W=520,H=180,pad={l:34,r:12,t:14,b:24};
+  const x0=pad.l,x1=W-pad.r,y0=pad.t,y1=H-pad.b;
+  const begin=Object.keys(weights).sort()[0]||today();
+  const totalDays=Math.max(1,daysBetween(begin,CFG.targetDate));
+  // y range
+  const vals=Object.values(weights);
+  let ymin=Math.min(CFG.goal,...(vals.length?vals:[CFG.goal]))-0.6;
+  let ymax=Math.max(CFG.start,...(vals.length?vals:[CFG.start]))+0.6;
+  const sx=d=>x0+(daysBetween(begin,d)/totalDays)*(x1-x0);
+  const sy=v=>y1-((v-ymin)/(ymax-ymin))*(y1-y0);
+
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet">`;
+  // grid + y labels
+  for(let i=0;i<=3;i++){
+    const v=ymin+(ymax-ymin)*i/3;
+    const yy=sy(v);
+    svg+=`<line x1="${x0}" y1="${yy}" x2="${x1}" y2="${yy}" stroke="#f0e7e5" stroke-width="1"/>`;
+    svg+=`<text x="${x0-5}" y="${yy+3}" font-size="9" fill="#b8aaa9" text-anchor="end">${v.toFixed(1)}</text>`;
+  }
+  // goal line
+  const gy=sy(CFG.goal);
+  svg+=`<line x1="${x0}" y1="${gy}" x2="${x1}" y2="${gy}" stroke="#5fb98e" stroke-width="1.4" stroke-dasharray="5 4"/>`;
+  svg+=`<text x="${x1}" y="${gy-4}" font-size="9" fill="#5fb98e" text-anchor="end">目標 ${CFG.goal}kg</text>`;
+  // ideal trend line start->goal
+  svg+=`<line x1="${sx(begin)}" y1="${sy(CFG.start)}" x2="${sx(CFG.targetDate)}" y2="${sy(CFG.goal)}" stroke="#f3c9c5" stroke-width="1.2" stroke-dasharray="2 3"/>`;
+  // data line
+  const keys=Object.keys(weights).sort();
+  if(keys.length){
+    let pts=keys.map(d=>[sx(d),sy(weights[d])]);
+    let path=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+    svg+=`<path d="${path}" fill="none" stroke="#f48a83" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+    pts.forEach(p=>svg+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.2" fill="#fff" stroke="#f48a83" stroke-width="2"/>`);
+    // x labels: first & last
+    svg+=`<text x="${sx(keys[0])}" y="${H-7}" font-size="9" fill="#b8aaa9" text-anchor="middle">${fmtDate(keys[0])}</text>`;
+  }
+  svg+=`<text x="${sx(CFG.targetDate)}" y="${H-7}" font-size="9" fill="#b8aaa9" text-anchor="end">8/15</text>`;
+  svg+="</svg>";
+  $("#chart").innerHTML=svg;
+
+  const cur=latestWeight();
+  if(cur!=null){
+    const lost=(CFG.start-cur).toFixed(1);
+    $("#chartNote").textContent=`スタートから ${lost>0?"−"+lost:"+"+Math.abs(lost)}kg ／ 点線=理想ペース`;
+  }else{
+    $("#chartNote").textContent="体重を記録するとグラフが表示されます";
+  }
+}
+
+/* ============ 日付矢印 ============ */
+$$("[data-nav]").forEach(b=>b.onclick=()=>{
+  const map={w:"#wDate",m:"#mDate",e:"#eDate",h:"#hDate"};
+  const inp=$(map[b.dataset.nav]);
+  inp.value=shiftDate(inp.value,parseInt(b.dataset.dir));
+  inp.dispatchEvent(new Event("change"));
+});
+
+/* ============ 初期化（Supabaseから読み込み→描画） ============ */
+function renderAll(){
+  renderWeightList();
+  renderMealList();
+  renderExList();
+  renderExRec();
+  renderHabit();
+  renderHome();
+}
+async function init(){
+  $("#chartNote").textContent="クラウドから読み込み中…";
+  try{ await loadAll(); }
+  catch(e){ showErr(e); }
+  renderAll();
+}
+init();
+</script>
+</body>
+</html>
